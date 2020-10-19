@@ -7,7 +7,7 @@ title:  Team
 
 
 ## Tongjie Wang
-***UCI Net ID***: ucinetid1
+***UCI Net ID***: tongjiew
 
 ## Zixuan Chen
 ***UCI Net ID***: ucinetid2
