@@ -1,1 +1,1 @@
-# ArtificialIdiot
+# gh-skeleton
