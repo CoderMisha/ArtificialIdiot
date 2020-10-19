@@ -23,4 +23,4 @@ Some sanity cases will be, if the agent can detect the block, if the agent can t
 
 ## Appointment with the Instructor
 
-3:30pm - 3:45pm, Wednesday, October 21, 2020
+04:45pm Thursday, October 22, 2020
