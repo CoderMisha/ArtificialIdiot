@@ -19,4 +19,4 @@ As described in summary, the score that the AI earns can be used as metric. More
 
 Some sanity cases will be, if the agent can detect the block, if the agent can tell the color of the block, if the agent can hit the block, etc. The moonshot will be play through the entire song just like the video mentioned above. For the visualization of internal algorithm, we are going to plot the view of agent with classification result, similar to the practice from a previous group:
 
-![algorithm visualize](./_images/algorithm_visualize.png)
+![algorithm visualize](https://raw.githubusercontent.com/WendyWjt/ArtificialIdiot/main/docs/_images/algorithm_visualize.png)
