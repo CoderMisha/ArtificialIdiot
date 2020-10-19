@@ -15,7 +15,7 @@ Object Detection, Convolutional Neural Network and Reinforcement Learning.
 
 ## Evaluation Plan
 
-As described in summary, the score that the AI earns can be used as metric. More specifically, a miss should decrease more score than a wrong color hit, since the later should be easier to improve on. Besides, the timing is important. More precise hit means higher score. For the baseline, we use average human performance on the game as the baseline.
+As described in summary, the score that the AI earns can be used as metric. More specifically, a miss should decrease more score than a wrong color hit, since the later should be easier to improve on. Besides, the timing is important. More precise hit means higher score. For the baseline, we use random move on the game as the baseline and we are expecting the agent achieve average human player performance (i.e. can hit the block with weapon in correct color relatively precisely most of the time on an easy level).
 
 Some sanity cases will be, if the agent can detect the block, if the agent can tell the color of the block, if the agent can hit the block, etc. The moonshot will be play through the entire song just like the video mentioned above. For the visualization of internal algorithm, we are going to plot the view of agent with classification result, similar to the practice from a previous group:
 
