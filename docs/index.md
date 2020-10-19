@@ -3,7 +3,6 @@ layout: default
 title:  Home
 ---
 
-// Source code: https://github.com/USER/PROJECT (_fix this_) <br>
 Source code: https://github.com/WendyWjt/ArtificialIdiot
 
 Reports:
