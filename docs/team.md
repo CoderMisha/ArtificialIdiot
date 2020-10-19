@@ -6,11 +6,11 @@ title:  Team
 # {{ page.title }}
 
 
-## USER 1
+## Tongjie Wang
 ***UCI Net ID***: ucinetid1
 
-## USER 2
+## Zixuan Chen
 ***UCI Net ID***: ucinetid2
 
-## USER 3
-***UCI Net ID***: ucinetid3
+## Jiangtong Wang
+***UCI Net ID***: jiangtow
