@@ -1,18 +1,9 @@
 import MalmoPython
 import malmoutils
-import random
+
 import time
 
-
-def generate_beats(x1, x2, y, z, prob=0.67):
-    ret = ''
-
-    for x in range(x1 + 1, x2):
-        if random.random() <= prob:
-            ret += f'<DrawBlock type="air" x="{x}" y="{y}" z="{z}"/>'
-    
-    return ret
-
+import cs175_drawing
 
 malmoutils.fix_print()
 
@@ -26,31 +17,18 @@ MISSION_XML = f'''<?xml version="1.0" encoding="UTF-8" ?>
 
         <ServerSection>
             <ServerHandlers>
-                <FlatWorldGenerator generatorString="3;minecraft:bedrock,2*minecraft:dirt,minecraft:grass;1;" />
+                <FlatWorldGenerator generatorString="3;128*0;1;" />
                 <DrawingDecorator>
-                    <DrawLine x1="-10" y1="4" z1="0" x2="150" y2="4" z2="0" type="air"/>
-
-                    <DrawLine x1="-10" y1="4" z1="0" x2="-1" y2="4" z2="0" type="rail"/>
-                    <DrawLine x1="121" y1="4" z1="0" x2="150" y2="4" z2="0" type="rail"/>
-
-                    <DrawLine x1="0" y1="3" z1="0" x2="120" y2="3" z2="0" type="redstone_block"/>
-                    <DrawLine x1="0" y1="4" z1="0" x2="120" y2="4" z2="0" type="golden_rail"/>
-
-                    <DrawLine x1="5" y1="5" z1="1" x2="115" y2="5" z2="1" type="wool" colour="LIGHT_BLUE"/>
-                    <DrawLine x1="5" y1="5" z1="-1" x2="115" y2="5" z2="-1" type="wool" colour="YELLOW"/>
-
-                    {generate_beats(5, 115, 5, 1)}
-                    {generate_beats(5, 115, 5, -1)}
+                    {cs175_drawing.map_generated}
                 </DrawingDecorator>
-                <ServerQuitFromTimeUp timeLimitMs="1000" description="out_of_time" />
-                <ServerQuitWhenAnyAgentFinishes />
+                <ServerQuitFromTimeUp timeLimitMs="5000" description="out_of_time" />
             </ServerHandlers>
         </ServerSection>
 
         <AgentSection mode="Creative">
             <Name>Artificial Idiot</Name>
             <AgentStart>
-                <Placement x="5" y="5" z="5" />
+                <Placement x="0" y="12" z="0" />
                 <Inventory>
                     <InventoryItem slot="0" type="diamond_pickaxe"/>
                     <InventoryItem slot="1" type="golden_pickaxe"/>
@@ -59,7 +37,6 @@ MISSION_XML = f'''<?xml version="1.0" encoding="UTF-8" ?>
             </AgentStart>
             <AgentHandlers>
                 <ObservationFromFullStats/>
-                <ContinuousMovementCommands turnSpeedDegs="180"/>
                 <InventoryCommands/>
                 <ObservationFromGrid>
                     <Grid name="nearby">
@@ -97,12 +74,20 @@ for retry in range(MAX_RETRIES):
         else:
             time.sleep(2)
 
+print("Waiting for the mission to start ", end=' ')
 world_state = AGENT_HOST.peekWorldState()
 while not world_state.has_mission_begun:
+    print(".", end="")
     time.sleep(0.1)
     world_state = AGENT_HOST.peekWorldState()
 
+print()
+print("Mission running ", end=' ')
+
 while world_state.is_mission_running:
+    print(".", end="")
+    time.sleep(1)
     world_state = AGENT_HOST.peekWorldState()
 
+print()
 print('Drawing is over - feel free to explore the world.')
