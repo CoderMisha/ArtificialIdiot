@@ -22,7 +22,7 @@ def init_malmo(agent_host, mission_xml):
 
     for retry in range(max_retries):
         try:
-            agent_host.startMission(my_mission, my_clients, my_mission_record, 0, "DiamondCollector")
+            agent_host.startMission(my_mission, my_clients, my_mission_record, 0, "ArtificialIdiot")
             break
         except RuntimeError as e:
             if retry == max_retries - 1:

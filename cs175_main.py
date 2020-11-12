@@ -10,7 +10,7 @@ import cs175_hyperparameter
 def main():
     malmoutils.fix_print()
     AGENT_HOST = MalmoPython.AgentHost()
-    # cs175_QNetwork.train(AGENT_HOST, cs175_hyperparameter.MISSION_XML)
+    cs175_QNetwork.train(AGENT_HOST, cs175_hyperparameter.MISSION_XML)
     '''
     MISSION = MalmoPython.MissionSpec(cs175_hyperparameter.MISSION_XML, True)
     MISSION_RECORD = MalmoPython.MissionRecordSpec()
@@ -42,7 +42,6 @@ def main():
         print(".", end="")
         time.sleep(1)
         world_state = AGENT_HOST.peekWorldState()
-        cs175_QNetwork.train(AGENT_HOST, cs175_hyperparameter.MISSION_XML)
 
     print()
     print('Drawing is over - feel free to explore the world.')

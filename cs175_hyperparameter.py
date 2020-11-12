@@ -16,11 +16,11 @@ LEARNING_RATE = 1e-4
 START_TRAINING = 500
 LEARN_FREQUENCY = 1
 ACTION_DICT = {
-    0: 'move 1',  # Turn right (?
-    1: 'turn 1',  # Turn left (?
+    # 0: 'move 1',  # Turn right (?
+    # 1: 'turn 1',  # Turn left (?
     # The slots are 0-indexed but the key commands are 1-indexed
-    2: 'hotbar.2 1',  # Hotbar No.1: diamond pickaxe
-    3: 'hotbar.3 1',  # Hotbar No.2: golden pickaxe
+    2: 'hotbar.1 1',  # Hotbar No.1: diamond pickaxe
+    3: 'hotbar.2 1',  # Hotbar No.2: golden pickaxe
 }
 
 reward_signal = '''
@@ -35,12 +35,18 @@ MISSION_XML = f'''<?xml version="1.0" encoding="UTF-8" ?>
             </About>
 
             <ServerSection>
+                <ServerInitialConditions>
+                    <Time>
+                        <StartTime>1000</StartTime>
+                        <AllowPassageOfTime>false</AllowPassageOfTime>
+                    </Time>
+                    <Weather>clear</Weather>
+                </ServerInitialConditions>
                 <ServerHandlers>
                     <FlatWorldGenerator generatorString="3;128*0;1;" />
                     <DrawingDecorator>
                         {cs175_drawing.map_generated}
                     </DrawingDecorator>
-                    <ServerQuitFromTimeUp timeLimitMs="5000" description="out_of_time" />
                 </ServerHandlers>
             </ServerSection>
 

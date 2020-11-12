@@ -14,30 +14,6 @@ import torch.nn as nn
 import cs175_utils
 import cs175_hyperparameter
 
-# Hyperparameters
-SIZE = 50
-REWARD_DENSITY = .1
-PENALTY_DENSITY = .02
-OBS_SIZE = 5
-MAX_EPISODE_STEPS = 100000000000000000000000000000000000000 # 100
-MAX_GLOBAL_STEPS = 100000000000000000000000000000000000000 # 10000
-REPLAY_BUFFER_SIZE = 10000
-EPSILON_DECAY = .999
-MIN_EPSILON = .1
-BATCH_SIZE = 128
-GAMMA = .9
-TARGET_UPDATE = 100
-LEARNING_RATE = 1e-4
-START_TRAINING = 500
-LEARN_FREQUENCY = 1
-ACTION_DICT = {
-    0: 'move 1',  # Turn right (?
-    1: 'turn 1',  # Turn left (?
-    # The slots are 0-indexed but the key commands are 1-indexed
-    2: 'hotbar.2 1',  # Hotbar No.1: diamond pickaxe
-    3: 'hotbar.3 1',  # Hotbar No.2: golden pickaxe
-}
-
 #####
 current_tool = None
 
@@ -117,7 +93,7 @@ def get_observation(agent_host, world_state):
     Returns
         observation: <np.array>
     """
-    obs = np.zeros((2, OBS_SIZE, OBS_SIZE))
+    obs = np.zeros((2, cs175_hyperparameter.OBS_SIZE, cs175_hyperparameter.OBS_SIZE))
 
     while world_state.is_mission_running:
         time.sleep(0.1)
@@ -133,7 +109,7 @@ def get_observation(agent_host, world_state):
             # Get observation
             grid = observations['nearby']
             grid_binary = [1 if x == 'diamond_ore' or x == 'lava' else 0 for x in grid]
-            obs = np.reshape(grid_binary, (2, OBS_SIZE, OBS_SIZE))
+            obs = np.reshape(grid_binary, (2, cs175_hyperparameter.OBS_SIZE, cs175_hyperparameter.OBS_SIZE))
 
             # Rotate observation with orientation of agent
             yaw = observations['Yaw']
@@ -163,7 +139,7 @@ def prepare_batch(replay_buffer):
         reward (tensor): float tensor of size (BATCH_SIZE)
         done (tensor): float tensor of size (BATCH_SIZE)
     """
-    batch_data = random.sample(replay_buffer, BATCH_SIZE)
+    batch_data = random.sample(replay_buffer, cs175_hyperparameter.BATCH_SIZE)
     obs = torch.tensor([x[0] for x in batch_data], dtype=torch.float)
     action = torch.tensor([x[1] for x in batch_data], dtype=torch.long)
     next_obs = torch.tensor([x[2] for x in batch_data], dtype=torch.float)
@@ -188,7 +164,7 @@ def learn(batch, optim, q_network, target_network):
     optim.zero_grad()
     values = q_network(obs).gather(1, action.unsqueeze(-1)).squeeze(-1)
     target = torch.max(target_network(next_obs), 1)[0]
-    target = reward + GAMMA * target * (1 - done)
+    target = reward + cs175_hyperparameter.GAMMA * target * (1 - done)
     loss = torch.mean((target - values) ** 2)
     loss.backward()
     optim.step()
@@ -218,15 +194,15 @@ def train(agent_host, mission_xml):
     Args:
         agent_host (MalmoPython.AgentHost)
     """
-    q_network = QNetwork((2, OBS_SIZE, OBS_SIZE), len(ACTION_DICT))
-    target_network = QNetwork((2, OBS_SIZE, OBS_SIZE), len(ACTION_DICT))
+    q_network = QNetwork((2, cs175_hyperparameter.OBS_SIZE, cs175_hyperparameter.OBS_SIZE), len(cs175_hyperparameter.ACTION_DICT))
+    target_network = QNetwork((2, cs175_hyperparameter.OBS_SIZE, cs175_hyperparameter.OBS_SIZE), len(cs175_hyperparameter.ACTION_DICT))
     target_network.load_state_dict(q_network.state_dict())
 
     # Init optimizer
-    optim = torch.optim.Adam(q_network.parameters(), lr=LEARNING_RATE)
+    optim = torch.optim.Adam(q_network.parameters(), lr=cs175_hyperparameter.LEARNING_RATE)
 
     # Init replay buffer
-    replay_buffer = deque(maxlen=REPLAY_BUFFER_SIZE)
+    replay_buffer = deque(maxlen=cs175_hyperparameter.REPLAY_BUFFER_SIZE)
 
     # Init vars
     global_step = 0
@@ -237,8 +213,8 @@ def train(agent_host, mission_xml):
     steps = []
 
     # Begin main loop
-    loop = tqdm(total=MAX_GLOBAL_STEPS, position=0, leave=False)
-    while global_step < MAX_GLOBAL_STEPS:
+    loop = tqdm(total=cs175_hyperparameter.MAX_GLOBAL_STEPS, position=0, leave=False)
+    while global_step < cs175_hyperparameter.MAX_GLOBAL_STEPS:
         episode_step = 0
         episode_return = 0
         episode_loss = 0
@@ -258,11 +234,10 @@ def train(agent_host, mission_xml):
         while world_state.is_mission_running:
             # Get action
             # allow_break_action = obs[1, int(OBS_SIZE / 2) - 1, int(OBS_SIZE / 2)] == 1
-            action_idx = random.choice([0]) #, 2, 3]) # get_action(obs, q_network, epsilon, allow_break_action)
-            command = ACTION_DICT[action_idx]
+            action_idx = random.choice([2, 3, 4]) # get_action(obs, q_network, epsilon, allow_break_action)
+            command = cs175_hyperparameter.ACTION_DICT[action_idx]
             _switch_tool(command)
             print("command:", command)
-            # time.sleep(10)
 
             # Take step
             agent_host.sendCommand(command)
