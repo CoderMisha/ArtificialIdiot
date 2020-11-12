@@ -2,3 +2,8 @@
 .vscode
 __pycache__
 *.pyc
+MalmoPython.lib
+MalmoPython.pyd
+malmoutils.py
+zlib.dll
+.python-version

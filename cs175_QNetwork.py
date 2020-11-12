@@ -239,8 +239,9 @@ def train(agent_host, mission_xml):
         # Run episode
         while world_state.is_mission_running:
             if not initialized:
-                _send_command_to_agent(agent_host, "hotbar.3 1")
+                time.sleep(3)
                 _send_command_to_agent(agent_host, "use 1")
+                _send_command_to_agent(agent_host, "use 0")
                 # _send_command_to_agent(agent_host, "hotbar.1 1")
                 # _send_command_to_agent(agent_host, "look -1")
                 # _send_command_to_agent(agent_host, "turn 1")

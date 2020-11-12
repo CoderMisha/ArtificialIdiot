@@ -70,15 +70,14 @@ MISSION_XML = f'''<?xml version="1.0" encoding="UTF-8" ?>
             <AgentSection mode="Survival">
                 <Name>Artificial Idiot</Name>
                 <AgentStart>
-                    <Placement x="4" y="10" z="1" yaw="93" pitch="45"/>
+                    <Placement x="3.5" y="11" z="0.5" yaw="90" pitch="65"/>
                     <Inventory>
                         <InventoryItem slot="0" type="diamond_pickaxe"/>
                         <InventoryItem slot="1" type="golden_pickaxe"/>
-                        <InventoryItem slot="2" type="minecart"/>
                     </Inventory>
                 </AgentStart>
                 <AgentHandlers>
-                    <DiscreteMovementCommands/>
+                    <ContinuousMovementCommands/>
                     <ObservationFromFullStats/>
                     <ObservationFromHotBar/>
                     <ObservationFromFullInventory/>

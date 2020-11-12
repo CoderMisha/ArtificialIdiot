@@ -130,6 +130,9 @@ def draw_starting_point(entry_x: int, entry_y: int, entry_z: int) -> Tuple[str, 
     {_draw_line(entry_x + 2, entry_x + 7, entry_y - 1, entry_y - 1, entry_z, entry_z, "iron_block")}
     {_draw_line(entry_x + 2, entry_x + 6, entry_y, entry_y, entry_z, entry_z, "golden_rail")}
     {_draw_block(entry_x + 7, entry_y, entry_z, "rail")}
+
+    <!--Cart-->
+    <DrawEntity x="{entry_x + 2.5}" y="{entry_y + 0.1}" z="{entry_z + 0.5}" type="MinecartRideable"/>
     ''', (entry_x + 8, entry_y, entry_z)
 
 
