@@ -20,7 +20,7 @@ current_tool = None
 
 # Q-Value Network
 class QNetwork(nn.Module):
-    def __init__(self, obs_size, action_size, hidden_size=100):
+    def __init__(self, obs_size, action_size, hidden_size=256):
         super().__init__()
         self.net = nn.Sequential(nn.Linear(np.prod(obs_size), hidden_size),
                                  nn.ReLU(),
@@ -64,22 +64,21 @@ def get_action(obs, q_network, epsilon, allow_break_action):
         action_values = q_network(obs_torch)
 
         # Remove attack/mine from possible actions if not facing a diamond
+        # TODO: fix
         if not allow_break_action:
             action_values[0, 3] = -float('inf')
 
-            # Select action with highest Q-value
-        # action_idx = torch.argmax(action_values).item()
+        # Select action with highest Q-value
         argmax_idx = torch.argmax(action_values).item()
-        prob = [0, 0, 0, 0]
-        for i in range(4):
+        len_action = len(cs175_hyperparameter.ACTION_DICT)
+        prob = [0 for i in range(len_action)]
+        for i in range(len_action):
             if i == argmax_idx:
                 prob[i] = 1 - epsilon
             else:
-                prob[i] = epsilon / 3
-        action_idx = np.random.choice([0, 1, 2, 3], 1, p=prob)[0]
-        # action_idx = torch.argmax(action_values).item()
-    #return action_idx
-    return random.choice([2, 3])
+                prob[i] = epsilon / (len_action - 1)
+        action_idx = np.random.choice(range(len_action), 1, p=prob)[0]
+    return action_idx
 
 
 def get_observation(agent_host, world_state):
@@ -107,11 +106,13 @@ def get_observation(agent_host, world_state):
             observations = json.loads(msg)
 
             # Get observation
+            # Currently: the 9 squares around the agent (y = 0) && the 9 squares above that (y = 1)
             grid = observations['nearby']
-            grid_binary = [1 if x == 'diamond_ore' or x == 'lava' else 0 for x in grid]
+            grid_binary = [1 if x == 'wool' or x == 'lever' else 0 for x in grid]
             obs = np.reshape(grid_binary, (2, cs175_hyperparameter.OBS_SIZE, cs175_hyperparameter.OBS_SIZE))
 
             # Rotate observation with orientation of agent
+            # ?: what if the agent tilt down
             yaw = observations['Yaw']
             if yaw == 270:
                 obs = np.rot90(obs, k=1, axes=(1, 2))
@@ -119,7 +120,6 @@ def get_observation(agent_host, world_state):
                 obs = np.rot90(obs, k=2, axes=(1, 2))
             elif yaw == 90:
                 obs = np.rot90(obs, k=3, axes=(1, 2))
-
             break
 
     return obs
@@ -183,8 +183,13 @@ def _hit_reward(reward_signal: int):
 
 
 def _switch_tool(command):
-    if command in (2, 3):
+    if command in (3, 4):
         current_tool = command
+
+
+def _send_command_to_agent(agent_host, command):
+    agent_host.sendCommand(command)
+    time.sleep(0.2)
 
 
 def train(agent_host, mission_xml):
@@ -228,40 +233,46 @@ def train(agent_host, mission_xml):
             world_state = agent_host.getWorldState()
             for error in world_state.errors:
                 print("\nError:", error.text)
-        # obs = get_observation(agent_host, world_state)
+        obs = get_observation(agent_host, world_state)
 
+        initialized = False
         # Run episode
         while world_state.is_mission_running:
+            if not initialized:
+                _send_command_to_agent(agent_host, "hotbar.3 1")
+                _send_command_to_agent(agent_host, "use 1")
+                # _send_command_to_agent(agent_host, "hotbar.1 1")
+                # _send_command_to_agent(agent_host, "look -1")
+                # _send_command_to_agent(agent_host, "turn 1")
+                # _send_command_to_agent(agent_host, "turn 1")
+                initialized = True
+
             # Get action
-            # allow_break_action = obs[1, int(OBS_SIZE / 2) - 1, int(OBS_SIZE / 2)] == 1
-            action_idx = random.choice([2, 3, 4]) # get_action(obs, q_network, epsilon, allow_break_action)
+            # allow_break_action = obs[1, int(cs175_hyperparameter.OBS_SIZE / 2) - 1, int(cs175_hyperparameter.OBS_SIZE / 2)] == 1
+            allow_break_action = True
+            action_idx = get_action(obs, q_network, epsilon, allow_break_action)
             command = cs175_hyperparameter.ACTION_DICT[action_idx]
             _switch_tool(command)
             print("command:", command)
 
             # Take step
-            agent_host.sendCommand(command)
-
-            # If your agent isn't registering reward you may need to increase this
-            time.sleep(.2)
+            _send_command_to_agent(agent_host, "use 1")
 
             # We have to manually calculate terminal state to give malmo time to register the end of the mission
             # If you see "commands connection is not open. Is the mission running?" you may need to increase this
             episode_step += 1
-            '''
-            if episode_step >= MAX_EPISODE_STEPS or \
-                    (obs[0, int(OBS_SIZE / 2) - 1, int(OBS_SIZE / 2)] == 1 and \
-                     obs[1, int(OBS_SIZE / 2) - 1, int(OBS_SIZE / 2)] == 0 and \
-                     command == 'move 1'):
-                done = True
-                time.sleep(3)
-            '''
+            # if episode_step >= MAX_EPISODE_STEPS or \
+            #         (obs[0, int(OBS_SIZE / 2) - 1, int(OBS_SIZE / 2)] == 1 and \
+            #          obs[1, int(OBS_SIZE / 2) - 1, int(OBS_SIZE / 2)] == 0 and \
+            #          command == 'move 1'):
+            #     done = True
+            #     time.sleep(3)
 
             # Get next observation
             world_state = agent_host.getWorldState()
             for error in world_state.errors:
                 print("Error:", error.text)
-            # next_obs = get_observation(world_state)
+            next_obs = get_observation(agent_host, world_state)
 
             # Get reward
             reward = 0
@@ -272,23 +283,21 @@ def train(agent_host, mission_xml):
             episode_return += reward
 
             # Store step in replay buffer
-            # replay_buffer.append((obs, action_idx, next_obs, reward, done))
-            # obs = next_obs
+            replay_buffer.append((obs, action_idx, next_obs, reward, done))
+            obs = next_obs
 
             # Learn
             global_step += 1
-            '''
-            if global_step > START_TRAINING and global_step % LEARN_FREQUENCY == 0:
-                batch = prepare_batch(replay_buffer)
-                loss = learn(batch, optim, q_network, target_network)
-                episode_loss += loss
-
-                if epsilon > MIN_EPSILON:
-                    epsilon *= EPSILON_DECAY
-
-                if global_step % TARGET_UPDATE == 0:
-                    target_network.load_state_dict(q_network.state_dict())
-            '''
+            # if global_step > START_TRAINING and global_step % LEARN_FREQUENCY == 0:
+            #     batch = prepare_batch(replay_buffer)
+            #     loss = learn(batch, optim, q_network, target_network)
+            #     episode_loss += loss
+            #
+            #     if epsilon > MIN_EPSILON:
+            #         epsilon *= EPSILON_DECAY
+            #
+            #     if global_step % TARGET_UPDATE == 0:
+            #         target_network.load_state_dict(q_network.state_dict())
 
         num_episode += 1
         returns.append(episode_return)
