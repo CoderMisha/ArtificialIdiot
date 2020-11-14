@@ -77,16 +77,8 @@ MISSION_XML = f'''<?xml version="1.0" encoding="UTF-8" ?>
                     </Inventory>
                 </AgentStart>
                 <AgentHandlers>
-                    <DiscreteMovementCommands> 
-                        <ModifierList type="deny-list"> 
-                            <command>use</command> 
-                        </ModifierList> 
-                    </DiscreteMovementCommands> 
-                    <ContinuousMovementCommands> 
-                        <ModifierList type="allow-list"> 
-                            <command>use</command> 
-                        </ModifierList> 
-                    </ContinuousMovementCommands>
+                    
+                    <ContinuousMovementCommands/>
                     <ObservationFromFullStats/>
                     <ObservationFromHotBar/>
                     <ObservationFromFullInventory/>
