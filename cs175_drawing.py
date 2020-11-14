@@ -87,30 +87,38 @@ def draw_branch_left(entry_x: int, entry_y: int, entry_z: int) -> Tuple[str, Tup
 
     <!--Redstone Circuit-->
 
-    {_draw_line(entry_x + 5, entry_x + 7, entry_y - 2, entry_y - 4, entry_z + 2, entry_z + 2, "iron_block")}
-    {_draw_line(entry_x + 5, entry_x + 7, entry_y - 1, entry_y - 3, entry_z + 2, entry_z + 2, "air")}
-    {_draw_line(entry_x + 5, entry_x + 7, entry_y - 1, entry_y - 3, entry_z + 2, entry_z + 2, "redstone_wire")}
+    {_draw_line(entry_x + 5, entry_x + 7, entry_y - 2, entry_y - 4, entry_z + 3, entry_z + 3, "iron_block")}
+    {_draw_line(entry_x + 4, entry_x + 7, entry_y, entry_y - 3, entry_z + 3, entry_z + 3, "air")}
+    {_draw_line(entry_x + 4, entry_x + 7, entry_y, entry_y - 3, entry_z + 3, entry_z + 3, "redstone_wire")}
 
-    {_draw_block(entry_x + 5, entry_y - 1, entry_z + 3, "iron_block")}
-    {_draw_block(entry_x + 5, entry_y, entry_z + 3, "air")}
-    {_draw_block(entry_x + 5, entry_y, entry_z + 3, "redstone_wire")}
+    {_draw_block(entry_x + 4, entry_y, entry_z + 4, "air")}
+    {_draw_block(entry_x + 4, entry_y, entry_z + 4, "redstone_wire")}
 
-    {_draw_line(entry_x + 4, entry_x + 4, entry_y + 1, entry_y, entry_z + 2, entry_z + 3, "iron_block")}
-    {_draw_line(entry_x + 4, entry_x + 4, entry_y + 2, entry_y + 1, entry_z + 2, entry_z + 3, "air")}
-    {_draw_line(entry_x + 4, entry_x + 4, entry_y + 2, entry_y + 1, entry_z + 2, entry_z + 3, "redstone_wire")}
+    {_draw_block(entry_x + 3, entry_y, entry_z + 4, "iron_block")}
+    {_draw_block(entry_x + 3, entry_y + 1, entry_z + 4, "air")}
+    {_draw_block(entry_x + 3, entry_y + 1, entry_z + 4, "redstone_wire")}
 
-    {_draw_line(entry_x + 5, entry_x + 3, entry_y + 1, entry_y + 1, entry_z + 1, entry_z + 1, "iron_block")}
-    {_draw_line(entry_x + 5, entry_x + 3, entry_y + 2, entry_y + 2, entry_z + 1, entry_z + 1, "air")}
-    {_draw_line(entry_x + 5, entry_x + 3, entry_y + 2, entry_y + 2, entry_z + 1, entry_z + 1, "redstone_wire")}
-    {_draw_line(entry_x + 5, entry_x + 3, entry_y + 1, entry_y + 1, entry_z, entry_z, "lever")}
+    {_draw_line(entry_x + 4, entry_x + 2, entry_y + 1, entry_y + 1, entry_z + 3, entry_z + 3, "iron_block")}
+    {_draw_line(entry_x + 4, entry_x + 2, entry_y + 2, entry_y + 2, entry_z + 3, entry_z + 3, "air")}
+    {_draw_line(entry_x + 4, entry_x + 2, entry_y + 2, entry_y + 2, entry_z + 3, entry_z + 3, "redstone_torch")}
+    {_draw_block(entry_x + 3, entry_y + 2, entry_z + 3, "redstone_wire")}
 
-    {_draw_block(entry_x + 8, entry_y - 4, entry_z + 2, "iron_block")}
-    {_draw_block(entry_x + 8, entry_y - 3, entry_z + 2, "air")}
-    {_draw_block(entry_x + 8, entry_y - 3, entry_z + 2, "redstone_wire")}
+    {_draw_line(entry_x + 4, entry_x + 2, entry_y, entry_y, entry_z + 2, entry_z + 2, "iron_block")}
+    {_draw_line(entry_x + 4, entry_x + 2, entry_y + 1, entry_y + 1, entry_z + 2, entry_z + 2, "air")}
+    {_draw_line(entry_x + 4, entry_x + 2, entry_y + 1, entry_y + 1, entry_z + 2, entry_z + 2, "redstone_wire")}
+    {_draw_block(entry_x + 3, entry_y, entry_z + 2, "air")}
+    {_draw_block(entry_x + 3, entry_y + 1, entry_z + 2, "air")}
 
-    {_draw_line(entry_x + 9, entry_x + 9, entry_y - 2, entry_y - 4, entry_z, entry_z + 2, "iron_block")}
-    {_draw_line(entry_x + 9, entry_x + 9, entry_y - 1, entry_y - 3, entry_z, entry_z + 2, "air")}
-    {_draw_line(entry_x + 9, entry_x + 9, entry_y - 1, entry_y - 3, entry_z, entry_z + 2, "redstone_wire")}
+    {_draw_line(entry_x + 4, entry_x + 2, entry_y + 1, entry_y + 1, entry_z + 1, entry_z + 1, "redstone_block")}
+    {_draw_block(entry_x + 3, entry_y  + 1, entry_z + 1, "air")}
+
+    {_draw_block(entry_x + 8, entry_y - 4, entry_z + 3, "iron_block")}
+    {_draw_block(entry_x + 8, entry_y - 3, entry_z + 3, "air")}
+    {_draw_block(entry_x + 8, entry_y - 3, entry_z + 3, "redstone_wire")}
+
+    {_draw_line(entry_x + 9, entry_x + 9, entry_y - 2, entry_y - 4, entry_z, entry_z + 3, "iron_block")}
+    {_draw_line(entry_x + 9, entry_x + 9, entry_y - 1, entry_y - 3, entry_z, entry_z + 3, "air")}
+    {_draw_line(entry_x + 9, entry_x + 9, entry_y - 1, entry_y - 3, entry_z, entry_z + 3, "redstone_wire")}
 
     {_draw_block(entry_x + 8, entry_y - 1, entry_z, "iron_block")}
     {_draw_block(entry_x + 8, entry_y, entry_z, "air")}
