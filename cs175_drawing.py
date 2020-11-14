@@ -149,7 +149,6 @@ def draw_starting_point(entry_x: int, entry_y: int, entry_z: int) -> Tuple[str, 
     {_draw_cuboid(entry_x + 1, entry_x - 1, entry_y - 1, entry_y, entry_z - 1, entry_z + 1, "gold_block")}
     {_draw_block(entry_x, entry_y + 1, entry_z, "beacon")}
     {_draw_block(entry_x, entry_y + 2, entry_z, "stained_glass", colour="YELLOW")}
-    {_draw_block(entry_x + 1, entry_y + 1, entry_z, "lever", face="UP_X")}
 
     <!--Rail-->
     {_draw_cuboid(entry_x + 2, entry_x + 7, entry_y, entry_y - 1, entry_z, entry_z, "air")}
@@ -159,6 +158,23 @@ def draw_starting_point(entry_x: int, entry_y: int, entry_z: int) -> Tuple[str, 
 
     <!--Cart-->
     <DrawEntity x="{entry_x + 2.5}" y="{entry_y + 0.1}" z="{entry_z + 0.5}" type="MinecartRideable"/>
+
+    <!--Start-->
+    {_draw_block(entry_x + 2, entry_y - 1, entry_z + 1, "iron_block")}
+    {_draw_block(entry_x + 2, entry_y, entry_z + 1, "redstone_wire")}
+
+    {_draw_block(entry_x + 2, entry_y, entry_z + 3, "iron_block")}
+    {_draw_block(entry_x + 2, entry_y + 1, entry_z + 3, "redstone_wire")}
+    
+    {_draw_block(entry_x + 3, entry_y, entry_z + 3, "iron_block")}
+    {_draw_block(entry_x + 3, entry_y + 1, entry_z + 3, "redstone_wire")}
+    
+    {_draw_block(entry_x + 3, entry_y, entry_z + 2, "iron_block")}
+    {_draw_block(entry_x + 3, entry_y + 1, entry_z + 2, "redstone_wire")}
+
+    {_draw_block(entry_x + 3, entry_y + 1, entry_z + 1, "redstone_block")}
+
+    {_draw_block(entry_x + 2, entry_y, entry_z + 2, "unlit_redstone_torch", face="NORTH")}
     ''', (entry_x + 8, entry_y, entry_z)
 
 
