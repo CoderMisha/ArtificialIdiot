@@ -246,21 +246,21 @@ def train(agent_host, mission_xml):
                 _send_command_to_agent(agent_host, "look -1")
                 _send_command_to_agent(agent_host, "turn 1")
                 _send_command_to_agent(agent_host, "turn 1")'''
-
+                
+                _send_command_to_agent(agent_host, "chat /gamemode creative")
                 _send_command_to_agent(agent_host, "use 1")
                 _send_command_to_agent(agent_host, "use 0")
                 _send_command_to_agent(agent_host, "pitch -1")
                 time.sleep(0.2)
                 _send_command_to_agent(agent_host, "pitch 0")
-                _send_command_to_agent(agent_host, "use 1")
-                _send_command_to_agent(agent_host, "use 0")
+
                 _send_command_to_agent(agent_host, "turn -1")
-                _send_command_to_agent(agent_host, "use 1")
+                #_send_command_to_agent(agent_host, "use 1")
                 time.sleep(0.5)
                 _send_command_to_agent(agent_host, "turn 0")
                 #_send_command_to_agent(agent_host, "use 0")
-                time.sleep(5)
                 _send_command_to_agent(agent_host, "attack 1")
+                _send_command_to_agent(agent_host, "attack 0")
                 
 
                 initialized = True
@@ -275,6 +275,8 @@ def train(agent_host, mission_xml):
 
             # Take step
             #_send_command_to_agent(agent_host, command)
+            _send_command_to_agent(agent_host, "attack 1")
+            _send_command_to_agent(agent_host, "attack 0")
 
             # We have to manually calculate terminal state to give malmo time to register the end of the mission
             # If you see "commands connection is not open. Is the mission running?" you may need to increase this
@@ -294,7 +296,7 @@ def train(agent_host, mission_xml):
 
             # Get reward
             reward = 0
-            time.sleep(3)
+            time.sleep(0.1)
             for r in world_state.rewards:
                 print("reward:", r.getValue())
                 reward += _hit_reward(r.getValue())
