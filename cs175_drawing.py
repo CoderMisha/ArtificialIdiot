@@ -55,49 +55,67 @@ def draw_branch_left(entry_x: int, entry_y: int, entry_z: int) -> Tuple[str, Tup
     :returns XML for the branch and entry point for next map component
     """
     return f'''<!--Clear-->
-    {_draw_cuboid(entry_x + 7, entry_x, entry_y, entry_y - 4, entry_z - 4, entry_z + 6, "air")}
+    {_draw_cuboid(entry_x + 11, entry_x, entry_y, entry_y - 4, entry_z - 4, entry_z + 6, "air")}
     
     <!--Lava pool for punish :(-->
-    {_draw_cuboid(entry_x + 5, entry_x + 1, entry_y - 1, entry_y - 3, entry_z + 3, entry_z + 6, "iron_block")}
-    {_draw_cuboid(entry_x + 4, entry_x + 2, entry_y - 1, entry_y - 1, entry_z + 4, entry_z + 5, "lava")}
+    {_draw_cuboid(entry_x + 4, entry_x, entry_y - 1, entry_y - 3, entry_z + 3, entry_z + 6, "iron_block")}
+    {_draw_cuboid(entry_x + 3, entry_x, entry_y - 1, entry_y - 1, entry_z + 4, entry_z + 5, "lava")}
+    {_draw_cuboid(entry_x - 1, entry_x - 1, entry_y - 1, entry_y - 16, entry_z + 4, entry_z + 5, "lava")}
 
     <!--Redstone Block and Golden Rail-->
-    {_draw_red_stone_and_golden_rail_as_line(entry_x, entry_x + 2, entry_y, entry_y, entry_z, entry_z)}
-    {_draw_red_stone_and_golden_rail_as_line(entry_x + 3, entry_x + 3, entry_y, entry_y, entry_z + 1, entry_z + 3)}
-    {_draw_block(entry_x + 3, entry_y - 1, entry_z, "iron_block")}
-    {_draw_block(entry_x + 3, entry_y, entry_z, "rail")}
-    {_draw_red_stone_and_golden_rail_as_line(entry_x + 3, entry_x + 3, entry_y, entry_y, entry_z - 1, entry_z - 3)}
-    {_draw_block(entry_x + 3, entry_y - 1, entry_z - 4, "iron_block")}
-    {_draw_block(entry_x + 3, entry_y, entry_z - 4, "rail")}
-    {_draw_red_stone_and_golden_rail_as_line(entry_x + 4, entry_x + 5, entry_y, entry_y, entry_z - 4, entry_z - 4)}
-    {_draw_block(entry_x + 6, entry_y - 1, entry_z - 4, "iron_block")}
-    {_draw_block(entry_x + 6, entry_y, entry_z - 4, "rail")}
-    {_draw_red_stone_and_golden_rail_as_line(entry_x + 6, entry_x + 6, entry_y, entry_y, entry_z - 3, entry_z - 1)}
-    {_draw_block(entry_x + 6, entry_y - 1, entry_z, "iron_block")}
-    {_draw_block(entry_x + 6, entry_y, entry_z, "rail")}
-    {_draw_block(entry_x + 7, entry_y - 1, entry_z, "redstone_block")}
-    {_draw_block(entry_x + 7, entry_y, entry_z, "golden_rail")}
+    {_draw_red_stone_and_golden_rail_as_line(entry_x, entry_x + 6, entry_y, entry_y, entry_z, entry_z)}
+    {_draw_red_stone_and_golden_rail_as_line(entry_x + 7, entry_x + 7, entry_y, entry_y, entry_z + 1, entry_z + 4)}
+
+    {_draw_block(entry_x + 7, entry_y - 1, entry_z + 5, "iron_block")}
+    {_draw_block(entry_x + 7, entry_y, entry_z + 5, "rail")}
+    {_draw_red_stone_and_golden_rail_as_line(entry_x + 5, entry_x + 6, entry_y, entry_y, entry_z + 5, entry_z + 5)}
+    {_draw_block(entry_x + 4, entry_y, entry_z + 5, "golden_rail")}
+
+    {_draw_block(entry_x + 7, entry_y - 1, entry_z, "iron_block")}
+    {_draw_block(entry_x + 7, entry_y, entry_z, "rail")}
+
+    {_draw_red_stone_and_golden_rail_as_line(entry_x + 7, entry_x + 7, entry_y, entry_y, entry_z - 1, entry_z - 3)}
+    {_draw_block(entry_x + 7, entry_y - 1, entry_z - 4, "iron_block")}
+    {_draw_block(entry_x + 7, entry_y, entry_z - 4, "rail")}
+    {_draw_red_stone_and_golden_rail_as_line(entry_x + 8, entry_x + 9, entry_y, entry_y, entry_z - 4, entry_z - 4)}
+    {_draw_block(entry_x + 10, entry_y - 1, entry_z - 4, "iron_block")}
+    {_draw_block(entry_x + 10, entry_y, entry_z - 4, "rail")}
+    {_draw_red_stone_and_golden_rail_as_line(entry_x + 10, entry_x + 10, entry_y, entry_y, entry_z - 3, entry_z - 1)}
+    {_draw_block(entry_x + 10, entry_y - 1, entry_z, "iron_block")}
+    {_draw_block(entry_x + 10, entry_y, entry_z, "rail")}
+    {_draw_red_stone_and_golden_rail_as_line(entry_x + 11, entry_x + 19, entry_y, entry_y, entry_z, entry_z)}
 
     <!--Redstone Circuit-->
-    {_draw_line(entry_x, entry_x + 3, entry_y - 1, entry_y - 4, entry_z + 2, entry_z + 2, "iron_block")}
-    {_draw_line(entry_x, entry_x + 3, entry_y, entry_y - 3, entry_z + 2, entry_z + 2, "air")}
-    {_draw_line(entry_x, entry_x + 3, entry_y, entry_y - 3, entry_z + 2, entry_z + 2, "redstone_wire")}
 
-    {_draw_block(entry_x + 4, entry_y - 4, entry_z + 2, "iron_block")}
-    {_draw_block(entry_x + 4, entry_y - 3, entry_z + 2, "air")}
-    {_draw_block(entry_x + 4, entry_y - 3, entry_z + 2, "redstone_wire")}
+    {_draw_line(entry_x + 5, entry_x + 7, entry_y - 2, entry_y - 4, entry_z + 2, entry_z + 2, "iron_block")}
+    {_draw_line(entry_x + 5, entry_x + 7, entry_y - 1, entry_y - 3, entry_z + 2, entry_z + 2, "air")}
+    {_draw_line(entry_x + 5, entry_x + 7, entry_y - 1, entry_y - 3, entry_z + 2, entry_z + 2, "redstone_wire")}
 
-    {_draw_line(entry_x + 5, entry_x + 5, entry_y - 2, entry_y - 4, entry_z, entry_z + 2, "iron_block")}
-    {_draw_line(entry_x + 5, entry_x + 5, entry_y - 1, entry_y - 3, entry_z, entry_z + 2, "air")}
-    {_draw_line(entry_x + 5, entry_x + 5, entry_y - 1, entry_y - 3, entry_z, entry_z + 2, "redstone_wire")}
+    {_draw_block(entry_x + 5, entry_y - 1, entry_z + 3, "iron_block")}
+    {_draw_block(entry_x + 5, entry_y, entry_z + 3, "air")}
+    {_draw_block(entry_x + 5, entry_y, entry_z + 3, "redstone_wire")}
 
-    {_draw_block(entry_x + 4, entry_y - 1, entry_z, "iron_block")}
-    {_draw_block(entry_x + 4, entry_y, entry_z, "air")}
-    {_draw_block(entry_x + 4, entry_y, entry_z, "redstone_wire")}
+    {_draw_line(entry_x + 4, entry_x + 4, entry_y + 1, entry_y, entry_z + 2, entry_z + 3, "iron_block")}
+    {_draw_line(entry_x + 4, entry_x + 4, entry_y + 2, entry_y + 1, entry_z + 2, entry_z + 3, "air")}
+    {_draw_line(entry_x + 4, entry_x + 4, entry_y + 2, entry_y + 1, entry_z + 2, entry_z + 3, "redstone_wire")}
 
-    {_draw_block(entry_x, entry_y - 1, entry_z + 1, "iron_block")}
-    {_draw_block(entry_x, entry_y, entry_z + 1, "lever", face="UP_Z")}
-    ''', (entry_x + 8, entry_y, entry_z)
+    {_draw_line(entry_x + 5, entry_x + 3, entry_y + 1, entry_y + 1, entry_z + 1, entry_z + 1, "iron_block")}
+    {_draw_line(entry_x + 5, entry_x + 3, entry_y + 2, entry_y + 2, entry_z + 1, entry_z + 1, "air")}
+    {_draw_line(entry_x + 5, entry_x + 3, entry_y + 2, entry_y + 2, entry_z + 1, entry_z + 1, "redstone_wire")}
+    {_draw_line(entry_x + 5, entry_x + 3, entry_y + 1, entry_y + 1, entry_z, entry_z, "lever")}
+
+    {_draw_block(entry_x + 8, entry_y - 4, entry_z + 2, "iron_block")}
+    {_draw_block(entry_x + 8, entry_y - 3, entry_z + 2, "air")}
+    {_draw_block(entry_x + 8, entry_y - 3, entry_z + 2, "redstone_wire")}
+
+    {_draw_line(entry_x + 9, entry_x + 9, entry_y - 2, entry_y - 4, entry_z, entry_z + 2, "iron_block")}
+    {_draw_line(entry_x + 9, entry_x + 9, entry_y - 1, entry_y - 3, entry_z, entry_z + 2, "air")}
+    {_draw_line(entry_x + 9, entry_x + 9, entry_y - 1, entry_y - 3, entry_z, entry_z + 2, "redstone_wire")}
+
+    {_draw_block(entry_x + 8, entry_y - 1, entry_z, "iron_block")}
+    {_draw_block(entry_x + 8, entry_y, entry_z, "air")}
+    {_draw_block(entry_x + 8, entry_y, entry_z, "redstone_wire")}
+    ''', (entry_x + 20, entry_y, entry_z)
 
 
 def draw_rail_line_with_beats(entry_x: int, entry_y: int, entry_z: int, length: int) -> Tuple[str, Tuple[int, int, int]]:

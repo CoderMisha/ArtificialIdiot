@@ -14,7 +14,7 @@ def init_malmo(agent_host, mission_xml):
     my_mission = MalmoPython.MissionSpec(mission_xml, True)
     my_mission_record = MalmoPython.MissionRecordSpec()
     my_mission.requestVideo(800, 500)
-    my_mission.setViewpoint(1)
+    my_mission.setViewpoint(0)
 
     max_retries = 3
     my_clients = MalmoPython.ClientPool()
