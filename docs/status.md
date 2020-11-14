@@ -6,7 +6,7 @@ title: Status
 
 ## Video Summary
 
-\[Youtube link\]
+[Demo Video](https://www.ics.uci.edu/~tongjiew/cs175/status_report_vid.mp4)
 
 ## Project Summary
 
