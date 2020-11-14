@@ -9,7 +9,7 @@ title: Status
 
 ## Project Summary
 
-We are planning to train an AI to play a minigame integrated with features in Beat-Saber and Dancing-Line in Minecraft (similar to the map in this YouTube video: Zedd & Jasmine Thompson - Funny (Minecraft Music Video \| Beat Synchronized!) but also included features similar to dancing line (reference to this YouTube video: Dancing Line \| The Piano %100 10/10 Gems)).
+We are planning to train an AI to play a minigame integrated with features in Beat-Saber (similar to the map in this YouTube video: Zedd & Jasmine Thompson - Funny (Minecraft Music Video \| Beat Synchronized!) but also included features similar to dancing line (similar to this YouTube video: Dancing Line \| The Piano %100 10/10 Gems)).
 <br>
 <br>
 The task of the AI is trying to hit the block along the railroad while riding on it with swords in the same color with the block at the proper time (i.e. right before the block is passing the agent). A correct and precise hit will increase the AI's score, and a miss or hitting with a sword in wrong color would decrease the score. The AI should take the game frame as input and perform "aim" (including turn, look / pitch), "switch tools", and "attack" actions correspondingly.
