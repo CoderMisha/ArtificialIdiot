@@ -178,6 +178,15 @@ def draw_starting_point(entry_x: int, entry_y: int, entry_z: int) -> Tuple[str, 
     ''', (entry_x + 8, entry_y, entry_z)
 
 
+def draw_finish_line(entry_x: int, entry_y: int, entry_z: int) -> Tuple[str, Tuple[int, int, int]]:
+    return f'''
+    {_draw_cuboid(entry_x + 10, entry_x, entry_y - 1, entry_y - 10, entry_z - 6, entry_z + 6, "stained_glass", colour="PINK")}
+    {_draw_cuboid(entry_x + 9, entry_x + 1, entry_y - 1, entry_y - 8, entry_z -5, entry_z + 5, "water")}
+    {_draw_block(entry_x, entry_y - 1, entry_z, "iron_block")}
+    {_draw_block(entry_x, entry_y, entry_z, "golden_rail")}
+    ''', (entry_x + 11, entry_y, entry_z)
+
+
 map_generated = _draw_cuboid(-256, 256, -256, 256, -256, 256, "air")
 xml, next_start = draw_starting_point(0, 10, 0)
 
@@ -188,12 +197,14 @@ map_generated += xml
 xml, next_start = draw_branch_left(*next_start)
 
 map_generated += xml
-xml, next_start = draw_rail_line_with_beats(*next_start, 10)
+xml, next_start = draw_rail_line_with_beats(*next_start, 20)
 
 map_generated += xml
 xml, next_start = draw_branch_left(*next_start)
 
-# FIXME: won't draw
-
 map_generated += xml
 xml, next_start = draw_rail_line_with_beats(*next_start, 20)
+
+map_generated += xml
+xml, _ = draw_finish_line(*next_start)
+map_generated += xml
