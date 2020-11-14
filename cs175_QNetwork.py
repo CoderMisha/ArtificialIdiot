@@ -241,11 +241,11 @@ def train(agent_host, mission_xml):
             if not initialized:
                 time.sleep(3)
                 _send_command_to_agent(agent_host, "use 1")
-                _send_command_to_agent(agent_host, "use 0")
-                # _send_command_to_agent(agent_host, "hotbar.1 1")
-                # _send_command_to_agent(agent_host, "look -1")
-                # _send_command_to_agent(agent_host, "turn 1")
-                # _send_command_to_agent(agent_host, "turn 1")
+                #_send_command_to_agent(agent_host, "use 0")
+                _send_command_to_agent(agent_host, "hotbar.1 1")
+                _send_command_to_agent(agent_host, "look -1")
+                _send_command_to_agent(agent_host, "turn 1")
+                _send_command_to_agent(agent_host, "turn 1")
                 initialized = True
 
             # Get action
@@ -257,7 +257,7 @@ def train(agent_host, mission_xml):
             print("command:", command)
 
             # Take step
-            _send_command_to_agent(agent_host, "use 1")
+            _send_command_to_agent(agent_host, command)
 
             # We have to manually calculate terminal state to give malmo time to register the end of the mission
             # If you see "commands connection is not open. Is the mission running?" you may need to increase this
