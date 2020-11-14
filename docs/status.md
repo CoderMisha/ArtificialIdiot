@@ -41,12 +41,12 @@ For qualitative evaluation, we will check the final result and check how the age
 <br><br><br>
 ## Remaining Goals and Challenges
 For challenges:
-- 1. It is quite hard to start the project with a scene in which the agent is sitting inside of the minecart and makes it hit the lever and start riding. DrawItem fails to draw minecart on the railroad, and the "use" command fails in discrete command mode.
-- 2. Moving and turning are relatively simple in discrete command mode, but hard in continuous mode, because it needs a stop signal to stop moving or turning. When to send the stop signal and how to make the agent learn to stop are quite difficult.
-- 3. The default reward system can't tell whether the agent hits the block with the tool in the same color.
-- 4. The current observation is limited. Since the cart goes fast, it might not be enough for the agent to learn.
-- 5. The current QNetwork sometimes makes the agent trap in turning and pitching.
-- 6. Due to the design of the map, sometimes the agent fails to collect the items after hitting blocks, because the items might fell down to the ground.
+- (C1) It is quite hard to start the project with a scene in which the agent is sitting inside of the minecart and makes it hit the lever and start riding. DrawItem fails to draw minecart on the railroad, and the "use" command fails in discrete command mode.
+- (C2) Moving and turning are relatively simple in discrete command mode, but hard in continuous mode, because it needs a stop signal to stop moving or turning. When to send the stop signal and how to make the agent learn to stop are quite difficult.
+- (C3) The default reward system can't tell whether the agent hits the block with the tool in the same color.
+- (C4) The current observation is limited. Since the cart goes fast, it might not be enough for the agent to learn.
+- (C5) The current QNetwork sometimes makes the agent trap in turning and pitching.
+- (C6) Due to the design of the map, sometimes the agent fails to collect the items after hitting blocks, because the items might fell down to the ground.
 <br><br>
 For solutions we have currently:
 - (C1) We designed a group of initialization missions to ask the agent to put the cart on the railroad, take the cart, and turn around first. After initialization missions are completed, normal training will start. Because "use" command fails in discrete mode, we will consider to use continuous command mode.
