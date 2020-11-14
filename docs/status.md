@@ -50,7 +50,7 @@ For challenges:
 <br><br>
 For solutions we have currently:
 - (C1) We designed a group of initialization missions to ask the agent to put the cart on the railroad, take the cart, and turn around first. After initialization missions are completed, normal training will start. Because "use" command fails in discrete mode, we will consider to use continuous command mode.
-- (C2) This problem will occur because we try to solve C1. Because deny-list mysteriously disables the functionality of turn and look/pitch, we change our design and switch our use of lever to redstones. In this case, we can continue to use discrete mode and will not use levers.
+- (C2) This problem will occur because we try to solve C1. Temporarily to complete latter parts of our project, we might consider to manually make the agent ride the cart, and let it learn by itself. In this case, we can continue to use discrete mode. In this case, we can continue to use discrete mode.
 - (C3) As described in Approach part, we will use user-defined reward functions and use the default reward system as a signal system.
 <br><br>
 Therefore, for goals and future plans:
