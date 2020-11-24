@@ -101,7 +101,10 @@ MISSION_XML = f'''<?xml version="1.0" encoding="UTF-8" ?>
                     <RewardForCollectingItem>
                         {reward_signal}
                     </RewardForCollectingItem>
+                    <ColourMapProducer>
+                        <Width>432</Width>
+                        <Height>240</Height>
+                    </ColourMapProducer>
                 </AgentHandlers>
             </AgentSection>
-
         </Mission>'''

@@ -31,6 +31,7 @@ def init_malmo(agent_host, mission_xml):
             else:
                 time.sleep(2)
 
+    agent_host.setVideoPolicy(MalmoPython.VideoPolicy.KEEP_ALL_FRAMES)
     return agent_host
 
 

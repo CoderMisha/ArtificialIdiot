@@ -81,6 +81,23 @@ def get_action(obs, q_network, epsilon, allow_break_action):
     return action_idx
 
 
+def get_color_map_frames(agent_host, world_state):
+    while world_state.is_mission_running:
+        time.sleep(0.1)
+        world_state = agent_host.getWorldState()
+
+        if len(world_state.errors) > 0:
+            for idx, e in enumerate(world_state.errors):
+                print(f'error #{idx}: {e.text}')
+            raise AssertionError('len(world_state.errors) > 0')
+
+        if world_state.number_of_video_frames_since_last_state > 0:
+            print(world_state.video_frames)
+            break
+    
+    return 
+
+
 def get_observation(agent_host, world_state):
     """
     Use the agent observation API to get a 2 x 5 x 5 grid around the agent.
@@ -192,6 +209,14 @@ def _send_command_to_agent(agent_host, command):
     time.sleep(0.2)
 
 
+def _attack(agent_host):
+    agent_host.sendCommand('chat /gamemode creative')
+    agent_host.sendCommand('attack 1')
+    time.sleep(0.05)
+    agent_host.sendCommand('attack 0')
+    agent_host.sendCommand('chat /gamemode survival')
+
+
 def train(agent_host, mission_xml):
     """
     Main loop for the DQN learning algorithm
@@ -233,19 +258,24 @@ def train(agent_host, mission_xml):
             world_state = agent_host.getWorldState()
             for error in world_state.errors:
                 print("\nError:", error.text)
+        
+        frames = get_color_map_frames(agent_host, world_state)
         obs = get_observation(agent_host, world_state)
 
         initialized = False
         # Run episode
         while world_state.is_mission_running:
             if not initialized:
-                time.sleep(3)
-                _send_command_to_agent(agent_host, "use 1")
-                #_send_command_to_agent(agent_host, "use 0")
-                _send_command_to_agent(agent_host, "hotbar.1 1")
-                _send_command_to_agent(agent_host, "look -1")
-                _send_command_to_agent(agent_host, "turn 1")
-                _send_command_to_agent(agent_host, "turn 1")
+                _send_command_to_agent(agent_host, "chat /gamemode creative")
+                _send_command_to_agent(agent_host, 'use 1')
+                _send_command_to_agent(agent_host, 'use 0')
+                _send_command_to_agent(agent_host, "pitch -1")
+                time.sleep(0.2)
+                _send_command_to_agent(agent_host, "pitch 0")
+                _send_command_to_agent(agent_host, "turn -1")
+                time.sleep(0.635)
+                _send_command_to_agent(agent_host, "turn 0")
+                _attack(agent_host)
                 initialized = True
 
             # Get action
@@ -273,6 +303,8 @@ def train(agent_host, mission_xml):
             world_state = agent_host.getWorldState()
             for error in world_state.errors:
                 print("Error:", error.text)
+            
+            next_frames = get_color_map_frames(agent_host, world_state)
             next_obs = get_observation(agent_host, world_state)
 
             # Get reward
