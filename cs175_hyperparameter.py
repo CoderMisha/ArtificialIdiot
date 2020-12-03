@@ -39,6 +39,10 @@ ACTION_DICT = {
 }
 
 
+VIDEO_WIDTH = 432
+VIDEO_HEIGHT = 240
+
+
 reward_signal = '''
                     <Item reward="5" type="wool" colour="LIGHT_BLUE" />
                     <Item reward="6" type="wool" colour="YELLOW"/>
@@ -102,8 +106,8 @@ MISSION_XML = f'''<?xml version="1.0" encoding="UTF-8" ?>
                         {reward_signal}
                     </RewardForCollectingItem>
                     <ColourMapProducer>
-                        <Width>432</Width>
-                        <Height>240</Height>
+                        <Width>''' + str(VIDEO_WIDTH) + '''</Width>
+                        <Height>''' + str(VIDEO_HEIGHT) + '''</Height>
                     </ColourMapProducer>
                 </AgentHandlers>
             </AgentSection>

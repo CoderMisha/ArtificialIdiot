@@ -82,6 +82,7 @@ def get_action(obs, q_network, epsilon, allow_break_action):
 
 
 def get_color_map_frames(agent_host, world_state):
+    print('try getting color map frames...')
     while world_state.is_mission_running:
         time.sleep(0.1)
         world_state = agent_host.getWorldState()
@@ -92,6 +93,7 @@ def get_color_map_frames(agent_host, world_state):
             raise AssertionError('len(world_state.errors) > 0')
 
         if world_state.number_of_video_frames_since_last_state > 0:
+            print('got new frame~')
             print(world_state.video_frames)
             break
     

@@ -5,15 +5,17 @@ try:
     from malmo import MalmoPython
 except:
     import MalmoPython
+from cs175_hyperparameter import VIDEO_WIDTH, VIDEO_HEIGHT
 
 
 def init_malmo(agent_host, mission_xml):
     """
     Initialize new malmo mission.
     """
+    agent_host.setVideoPolicy(MalmoPython.VideoPolicy.LATEST_FRAME_ONLY)
     my_mission = MalmoPython.MissionSpec(mission_xml, True)
     my_mission_record = MalmoPython.MissionRecordSpec()
-    my_mission.requestVideo(800, 500)
+    my_mission.requestVideo(VIDEO_WIDTH, VIDEO_HEIGHT)
     my_mission.setViewpoint(0)
 
     max_retries = 3
@@ -30,8 +32,6 @@ def init_malmo(agent_host, mission_xml):
                 exit(1)
             else:
                 time.sleep(2)
-
-    agent_host.setVideoPolicy(MalmoPython.VideoPolicy.KEEP_ALL_FRAMES)
     return agent_host
 
 
