@@ -8,20 +8,39 @@ except:
 import sys
 import time
 import json
+import enum
 import matplotlib.pyplot as plt
 import numpy as np
-from numpy.random import randint
 
-import gym, ray
+import gym
+import ray
 from gym.spaces import Discrete, Box
 from ray.rllib.agents import ppo
 import pyautogui
-from datetime import datetime
+
+# pyautogui
+# Moving mouse with a distance of 100 pixels is equivalent to
+# moving 15 degrees in game (at least on my computer)
+
+import cs175_drawing
+
+
+class NoobSaberAction(enum.Enum):
+    NOP = 0
+    ATTACK_LEFT = 1
+    ATTACK_RIGHT = 2
+
+    def short_name(self):
+        if self == NoobSaberAction.NOP:
+            return 'NOP'
+        if self == NoobSaberAction.ATTACK_LEFT:
+            return 'ATK_L'
+        
+        return 'ATK_R'  # ATTACK_RIGHT
 
 
 class NoobSaber(gym.Env):
-
-    def __init__(self, env_config):  
+    def __init__(self, env_config):
         # Static Parameters
         self.size = 50
         self.reward_density = .1
@@ -29,21 +48,18 @@ class NoobSaber(gym.Env):
         self.obs_size = 5
         self.max_episode_steps = 100
         self.log_frequency = 10
-        self.action_dict = {
-            0: 'move 1',  # Move one block forward
-            1: 'turn 1',  # Turn 90 degrees to the right
-            2: 'turn -1',  # Turn 90 degrees to the left
-            3: 'attack 1'  # Destroy block
-        }
+        self.action_list = list(NoobSaberAction)
+        self.video_width = 640
+        self.video_height = 480
 
         # Rllib Parameters
-        self.action_space = Discrete(len(self.action_dict))
+        self.action_space = Discrete(len(self.action_list))
         self.observation_space = Box(0, 1, shape=(np.prod([2, self.obs_size, self.obs_size]), ), dtype=np.int32)
 
         # Malmo Parameters
         self.agent_host = MalmoPython.AgentHost()
         try:
-            self.agent_host.parse( sys.argv )
+            self.agent_host.parse(sys.argv)
         except RuntimeError as e:
             print('ERROR:', e)
             print(self.agent_host.getUsage())
@@ -74,8 +90,7 @@ class NoobSaber(gym.Env):
         self.episode_step = 0
 
         # Log
-        if len(self.returns) > self.log_frequency and \
-            len(self.returns) % self.log_frequency == 0:
+        if len(self.returns) > self.log_frequency and len(self.returns) % self.log_frequency == 0:
             self.log_returns()
 
         # Get Observation
@@ -83,12 +98,12 @@ class NoobSaber(gym.Env):
 
         return self.obs.flatten()
 
-    def step(self, action):
+    def step(self, action_idx):
         """
         Take an action in the environment and return the results.
 
         Args
-            action: <int> index of the action to take
+            action_idx: <int> index of the action to take
 
         Returns
             observation: <np.array> flattened array of obseravtion
@@ -98,27 +113,22 @@ class NoobSaber(gym.Env):
         """
 
         # Get Action
-        command = self.action_dict[action]
-        allow_break_action = self.obs[1, int(self.obs_size/2)-1, int(self.obs_size/2)] == 1
-        if command != 'attack 1' or allow_break_action:
-            self.agent_host.sendCommand(command)
-            time.sleep(.1)
-            self.episode_step += 1
+        action = self.action_list[action_idx]
+        self._make_action(action)
+        time.sleep(.1)
+        self.episode_step += 1
 
         # Get Done
         done = False
-        if self.episode_step >= self.max_episode_steps or \
-                (self.obs[0, int(self.obs_size/2)-1, int(self.obs_size/2)] == 1 and \
-                self.obs[1, int(self.obs_size/2)-1, int(self.obs_size/2)] == 0 and \
-                command == 'move 1'):
+        if self.episode_step >= self.max_episode_steps:
             done = True
-            time.sleep(2)  
+            time.sleep(2)
 
         # Get Observation
         world_state = self.agent_host.getWorldState()
         for error in world_state.errors:
             print("Error:", error.text)
-        self.obs = self.get_observation(world_state) 
+        self.obs = self.get_observation(world_state)
 
         # Get Reward
         reward = 0
@@ -129,62 +139,58 @@ class NoobSaber(gym.Env):
         return self.obs.flatten(), reward, done, dict()
 
     def get_mission_xml(self):
-        return '''<?xml version="1.0" encoding="UTF-8" standalone="no" ?>
-                <Mission xmlns="http://ProjectMalmo.microsoft.com" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+        return f'''<?xml version="1.0" encoding="UTF-8" ?>
+        <Mission xmlns="http://ProjectMalmo.microsoft.com" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+            <About>
+                <Summary>CS 175 World Drawing</Summary>
+            </About>
 
-                    <About>
-                        <Summary>Diamond Collector</Summary>
-                    </About>
+            <ServerSection>
+                <ServerInitialConditions>
+                    <Time>
+                        <StartTime>1000</StartTime>
+                        <AllowPassageOfTime>false</AllowPassageOfTime>
+                    </Time>
+                    <Weather>clear</Weather>
+                </ServerInitialConditions>
+                <ServerHandlers>
+                    <FlatWorldGenerator generatorString="3;128*0;1;" />
+                    <DrawingDecorator>
+                        {cs175_drawing.map_generated}
+                    </DrawingDecorator>
+                </ServerHandlers>
+            </ServerSection>
 
-                    <ServerSection>
-                        <ServerInitialConditions>
-                            <Time>
-                                <StartTime>12000</StartTime>
-                                <AllowPassageOfTime>false</AllowPassageOfTime>
-                            </Time>
-                            <Weather>clear</Weather>
-                        </ServerInitialConditions>
-                        <ServerHandlers>
-                            <FlatWorldGenerator generatorString="3;7,2;1;"/>
-                            <DrawingDecorator>''' + \
-                                "<DrawCuboid x1='{}' x2='{}' y1='2' y2='2' z1='{}' z2='{}' type='air'/>".format(-self.size, self.size, -self.size, self.size) + \
-                                "<DrawCuboid x1='{}' x2='{}' y1='1' y2='1' z1='{}' z2='{}' type='stone'/>".format(-self.size, self.size, -self.size, self.size) + \
-                                "".join(["<DrawBlock x='{}'  y='2' z='{}' type='diamond_ore' />".format(randint(-self.size, self.size), randint(-self.size, self.size)) for _ in range(int(4*self.size*self.size*self.reward_density))]) + \
-                                "".join(["<DrawBlock x='{}'  y='1' z='{}' type='lava' />".format(randint(-self.size, self.size), randint(-self.size, self.size)) for _ in range(int(4*self.size*self.size*self.penalty_density))]) + \
-                                '''<DrawBlock x='0'  y='2' z='0' type='air' />
-                                <DrawBlock x='0'  y='1' z='0' type='stone' />
-                            </DrawingDecorator>
-                            <ServerQuitWhenAnyAgentFinishes/>
-                        </ServerHandlers>
-                    </ServerSection>
-
-                    <AgentSection mode="Survival">
-                        <Name>CS175DiamondCollector</Name>
-                        <AgentStart>
-                            <Placement x="0.5" y="2" z="0.5" pitch="45" yaw="0"/>
-                            <Inventory>
-                                <InventoryItem slot="0" type="diamond_pickaxe"/>
-                            </Inventory>
-                        </AgentStart>
-                        <AgentHandlers>
-                            <DiscreteMovementCommands/>
-                            <RewardForCollectingItem>
-                                <Item type="diamond" reward="1" />
-                            </RewardForCollectingItem>
-                            <RewardForMissionEnd rewardForDeath="-1">
-                                <Reward reward="0" description="Mission End"/>
-                            </RewardForMissionEnd>
-                            <ObservationFromFullStats/>
-                            <ObservationFromGrid>
-                                <Grid name="floorAll">
-                                    <min x="-'''+str(int(self.obs_size/2))+'''" y="-1" z="-'''+str(int(self.obs_size/2))+'''"/>
-                                    <max x="'''+str(int(self.obs_size/2))+'''" y="0" z="'''+str(int(self.obs_size/2))+'''"/>
-                                </Grid>
-                            </ObservationFromGrid>
-                            <AgentQuitFromReachingCommandQuota total="'''+str(self.max_episode_steps)+'''" />
-                        </AgentHandlers>
-                    </AgentSection>
-                </Mission>'''
+            <AgentSection mode="Survival">
+                <Name>Artificial Idiot</Name>
+                <AgentStart>
+                    <Placement x="3.5" y="11" z="0.5" yaw="90" pitch="65"/>
+                    <Inventory>
+                        <InventoryItem slot="0" type="diamond_pickaxe"/>
+                        <InventoryItem slot="1" type="golden_pickaxe"/>
+                    </Inventory>
+                </AgentStart>
+                <AgentHandlers>
+                    <DiscreteMovementCommands/>
+                    <ObservationFromFullStats/>
+                    <ObservationFromHotBar/>
+                    <ObservationFromFullInventory/>
+                    <ObservationFromRay/>
+                    <ObservationFromGrid>
+                        <Grid name="floorAll">
+                            <min x="-{int(self.obs_size/2)}" y="-1" z="-{int(self.obs_size/2)}"/>
+                            <max x="{int(self.obs_size/2)}" y="0" z="{int(self.obs_size/2)}"/>
+                        </Grid>
+                    </ObservationFromGrid>
+                    <InventoryCommands/>
+                    <ColourMapProducer>
+                        <Width>{self.video_width}</Width>
+                        <Height>{self.video_height}</Height>
+                    </ColourMapProducer>
+                    <AgentQuitFromReachingCommandQuota total="{self.max_episode_steps + 1}" />
+                </AgentHandlers>
+            </AgentSection>
+        </Mission>'''
 
     def init_malmo(self):
         """
@@ -197,12 +203,19 @@ class NoobSaber(gym.Env):
 
         max_retries = 3
         my_clients = MalmoPython.ClientPool()
-        my_clients.add(MalmoPython.ClientInfo('127.0.0.1', 10000)) # add Minecraft machines here as available
+        # add Minecraft machines here as available
+        my_clients.add(MalmoPython.ClientInfo('127.0.0.1', 10000))
         time.sleep(10)
 
         for retry in range(max_retries):
             try:
-                self.agent_host.startMission( my_mission, my_clients, my_mission_record, 0, 'DiamondCollector' )
+                self.agent_host.startMission(
+                    my_mission,
+                    my_clients,
+                    my_mission_record,
+                    0,
+                    'NoobSaber'
+                )
                 break
             except RuntimeError as e:
                 if retry == max_retries - 1:
@@ -217,6 +230,25 @@ class NoobSaber(gym.Env):
             world_state = self.agent_host.getWorldState()
             for error in world_state.errors:
                 print("\nError:", error.text)
+
+        pyautogui.press('enter')
+        pyautogui.rightClick()
+
+        # head's up
+        pyautogui.move(0, -200)
+        pyautogui.move(0, -200)
+        pyautogui.move(0, -50)
+
+        # turn around
+        for _ in range(6):
+            pyautogui.move(-200, 0)
+        
+        # hit redstone to start
+        pyautogui.move(200, 0)
+        self.agent_host.sendCommand('attack 1')
+        pyautogui.move(-200, 0)
+
+        pyautogui.press('enter')
 
         return world_state
 
@@ -257,7 +289,7 @@ class NoobSaber(gym.Env):
                     obs = np.rot90(obs, k=2, axes=(1, 2))
                 elif yaw == 90:
                     obs = np.rot90(obs, k=3, axes=(1, 2))
-                
+
                 break
 
         return obs
@@ -281,7 +313,23 @@ class NoobSaber(gym.Env):
 
         with open('returns.txt', 'w') as f:
             for step, value in zip(self.steps, self.returns):
-                f.write("{}\t{}\n".format(step, value)) 
+                f.write("{}\t{}\n".format(step, value))
+
+    def _make_action(self, action: NoobSaberAction):       
+        if action == NoobSaberAction.NOP:
+            pass
+        elif action == NoobSaberAction.ATTACK_LEFT:
+            pyautogui.press('enter')
+            pyautogui.move(-200, 0)
+            self.agent_host.sendCommand('attack 1')
+            pyautogui.move(200, 0)
+            pyautogui.press('enter')
+        elif action == NoobSaberAction.ATTACK_RIGHT:
+            pyautogui.press('enter')
+            pyautogui.move(200, 0)
+            self.agent_host.sendCommand('attack 1')
+            pyautogui.move(-200, 0)
+            pyautogui.press('enter')
 
 
 if __name__ == '__main__':
