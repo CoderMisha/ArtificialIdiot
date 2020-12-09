@@ -17,6 +17,7 @@ import ray
 from gym.spaces import Discrete, Box
 from ray.rllib.agents import ppo
 import pyautogui
+from PIL import Image
 
 # pyautogui
 # Moving mouse with a distance of 100 pixels is equivalent to
@@ -49,14 +50,14 @@ class NoobSaber(gym.Env):
         self.max_episode_steps = 100
         self.log_frequency = 10
         self.action_list = list(NoobSaberAction)
-        self.video_width = 640
-        self.video_height = 480
 
         # Rllib Parameters
         self.action_space = Discrete(len(self.action_list))
         self.observation_space = Box(0, 1, shape=(np.prod([2, self.obs_size, self.obs_size]), ), dtype=np.int32)
 
         # Malmo Parameters
+        self.video_width = 960
+        self.video_height = 540
         self.agent_host = MalmoPython.AgentHost()
         try:
             self.agent_host.parse(sys.argv)
@@ -94,6 +95,7 @@ class NoobSaber(gym.Env):
             self.log_returns()
 
         # Get Observation
+        self.get_color_map_frames(world_state)
         self.obs = self.get_observation(world_state)
 
         return self.obs.flatten()
@@ -128,6 +130,7 @@ class NoobSaber(gym.Env):
         world_state = self.agent_host.getWorldState()
         for error in world_state.errors:
             print("Error:", error.text)
+        self.get_color_map_frames(world_state)
         self.obs = self.get_observation(world_state)
 
         # Get Reward
@@ -198,8 +201,8 @@ class NoobSaber(gym.Env):
         """
         my_mission = MalmoPython.MissionSpec(self.get_mission_xml(), True)
         my_mission_record = MalmoPython.MissionRecordSpec()
-        my_mission.requestVideo(800, 500)
-        my_mission.setViewpoint(1)
+        my_mission.requestVideo(self.video_width, self.video_height)
+        my_mission.setViewpoint(0)
 
         max_retries = 3
         my_clients = MalmoPython.ClientPool()
@@ -242,15 +245,43 @@ class NoobSaber(gym.Env):
         # turn around
         for _ in range(6):
             pyautogui.move(-200, 0)
-        
+
         # hit redstone to start
         pyautogui.move(200, 0)
+        time.sleep(0.1)
         self.agent_host.sendCommand('attack 1')
+        time.sleep(0.1)
         pyautogui.move(-200, 0)
 
         pyautogui.press('enter')
 
         return world_state
+
+    def get_color_map_frames(self, world_state):
+        frames = []
+
+        while world_state.is_mission_running:
+            time.sleep(0.1)
+            world_state = self.agent_host.getWorldState()
+
+            if len(world_state.errors) > 0:
+                for idx, e in enumerate(world_state.errors):
+                    print(f'error #{idx}: {e.text}', file=sys.stderr)
+                raise RuntimeError('Could not load color map frame(s).')
+
+            if world_state.number_of_video_frames_since_last_state > 0:
+                for frame in world_state.video_frames:
+                    if frame.frametype == MalmoPython.FrameType.COLOUR_MAP:
+                        img = Image.frombytes(
+                            'RGB',
+                            (self.video_width, self.video_height),
+                            bytes(frame.pixels)
+                        )
+                        img.save('cm_output.png')
+                        img.close()
+                        frames.append(frame)
+                break
+        return frames
 
     def get_observation(self, world_state):
         """
@@ -315,7 +346,7 @@ class NoobSaber(gym.Env):
             for step, value in zip(self.steps, self.returns):
                 f.write("{}\t{}\n".format(step, value))
 
-    def _make_action(self, action: NoobSaberAction):       
+    def _make_action(self, action: NoobSaberAction):
         if action == NoobSaberAction.NOP:
             pass
         elif action == NoobSaberAction.ATTACK_LEFT:
