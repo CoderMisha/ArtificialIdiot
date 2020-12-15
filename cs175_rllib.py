@@ -1,4 +1,5 @@
 # Rllib docs: https://docs.ray.io/en/latest/rllib.html
+# PPO: https://docs.ray.io/en/master/rllib-algorithms.html#ppo
 
 try:
     from malmo import MalmoPython
@@ -66,7 +67,7 @@ class NoobSaber(gym.Env):
             print(self.agent_host.getUsage())
             exit(1)
 
-        # DiamondCollector Parameters
+        # Parameters
         self.obs = None
         self.episode_step = 0
         self.episode_return = 0
@@ -89,6 +90,8 @@ class NoobSaber(gym.Env):
         self.steps.append(current_step + self.episode_step)
         self.episode_return = 0
         self.episode_step = 0
+
+        # TODO: Reset mouse movement
 
         # Log
         if len(self.returns) > self.log_frequency and len(self.returns) % self.log_frequency == 0:
@@ -113,7 +116,6 @@ class NoobSaber(gym.Env):
             done: <bool> indicates terminal state
             info: <dict> dictionary of extra information
         """
-
         # Get Action
         action = self.action_list[action_idx]
         self._make_action(action)
@@ -122,7 +124,7 @@ class NoobSaber(gym.Env):
 
         # Get Done
         done = False
-        if self.episode_step >= self.max_episode_steps:
+        if self.episode_step >= self.max_episode_steps or not self.agent_host.getWorldState().is_mission_running:
             done = True
             time.sleep(2)
 
@@ -186,6 +188,10 @@ class NoobSaber(gym.Env):
                         </Grid>
                     </ObservationFromGrid>
                     <InventoryCommands/>
+                    <RewardForCollectingItem>
+                        <Item reward="5" type="wool" colour="LIGHT_BLUE" />
+                        <Item reward="6" type="wool" colour="YELLOW" />
+                    </RewardForCollectingItem>
                     <ColourMapProducer>
                         <Width>{self.video_width}</Width>
                         <Height>{self.video_height}</Height>
@@ -281,6 +287,7 @@ class NoobSaber(gym.Env):
                         img.close()
                         frames.append(frame)
                 break
+
         return frames
 
     def get_observation(self, world_state):
@@ -367,9 +374,11 @@ if __name__ == '__main__':
     ray.init()
     trainer = ppo.PPOTrainer(env=NoobSaber, config={
         'env_config': {},           # No environment parameters to configure
-        'framework': 'torch',       # Use pyotrch instead of tensorflow
-        'num_gpus': 0,              # We aren't using GPUs
-        'num_workers': 0            # We aren't using parallelism
+        'framework': 'tf2',         # Use tensorflow
+        'num_gpus': 0.5,              # ? If possible, use GPUs
+        'num_workers': 0,           # We aren't using parallelism
+        "train_batch_size": 1000,
+        "sgd_minibatch_size": 64,
     })
 
     while True:
