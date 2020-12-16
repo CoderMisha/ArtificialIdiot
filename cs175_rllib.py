@@ -188,15 +188,24 @@ class NoobSaber(gym.Env):
                         </Grid>
                     </ObservationFromGrid>
                     <InventoryCommands/>
+                    <RewardForTouchingBlockType>
+                        <Block type="water" reward="1000" />
+                        <Block type="lava" reward="-1000" />
+                    </RewardForTouchingBlockType>
+                    <RewardForTimeTaken initialReward="0" delta="0.1" density="PER_TICK" />
                     <RewardForCollectingItem>
-                        <Item reward="5" type="wool" colour="LIGHT_BLUE" />
-                        <Item reward="6" type="wool" colour="YELLOW" />
+                        <Item reward="50" type="wool" colour="LIGHT_BLUE" />
+                        <Item reward="60" type="wool" colour="YELLOW" />
                     </RewardForCollectingItem>
                     <ColourMapProducer>
                         <Width>{self.video_width}</Width>
                         <Height>{self.video_height}</Height>
                     </ColourMapProducer>
                     <AgentQuitFromReachingCommandQuota total="{self.max_episode_steps + 1}" />
+                    <AgentQuitFromTouchingBlockType>
+                        <Block type="water" description="success"/>
+                        <Block type="lava" description="dead end"/>
+                    </AgentQuitFromTouchingBlockType>
                 </AgentHandlers>
             </AgentSection>
         </Mission>'''
@@ -374,11 +383,11 @@ if __name__ == '__main__':
     ray.init()
     trainer = ppo.PPOTrainer(env=NoobSaber, config={
         'env_config': {},           # No environment parameters to configure
-        'framework': 'tf2',         # Use tensorflow
+        'framework': 'torch',         # Use tensorflow
         'num_gpus': 0.5,              # ? If possible, use GPUs
         'num_workers': 0,           # We aren't using parallelism
-        "train_batch_size": 1000,
-        "sgd_minibatch_size": 64,
+        # "train_batch_size": 100,
+        # "sgd_minibatch_size": 64,
     })
 
     while True:
