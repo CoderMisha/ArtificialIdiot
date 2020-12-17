@@ -52,6 +52,9 @@ class NoobSaber(gym.Env):
         self.log_frequency = 10
         self.action_list = list(NoobSaberAction)
 
+        self.obs_height = 314
+        self.obs_width = 396
+
         # Rllib Parameters
         self.action_space = Discrete(len(self.action_list))
         self.observation_space = Box(0, 1, shape=(np.prod([2, self.obs_size, self.obs_size]), ), dtype=np.int32)
@@ -102,7 +105,7 @@ class NoobSaber(gym.Env):
         # self.obs = self.get_observation(world_state)
 
         # return self.obs.flatten()
-        return self._resize_frame_pixels(cur_frame)
+        return self._resize_frame_pixels(cur_frame, self.obs_width, self.obs_height)
 
     def step(self, action_idx):
         """
@@ -119,7 +122,7 @@ class NoobSaber(gym.Env):
         """
         # Get Action
         action = self.action_list[action_idx]
-        # self._make_action(action)
+        self._make_action(action)
         time.sleep(.1)
         self.episode_step += 1
 
@@ -143,7 +146,7 @@ class NoobSaber(gym.Env):
         self.episode_return += reward
 
         # return self.obs.flatten(), reward, done, dict()
-        return self._resize_frame_pixels(cur_frame), reward, done, dict()
+        return self._resize_frame_pixels(cur_frame, self.obs_width, self.obs_height), reward, done, dict()
 
     def get_mission_xml(self):
         return f'''<?xml version="1.0" encoding="UTF-8" ?>
@@ -293,8 +296,8 @@ class NoobSaber(gym.Env):
                         #     'RGB',
                         #     # (self.video_width, self.video_height),
                         #     # bytes(frame.pixels)
-                        #     (396, 314),
-                        #     bytes(self._resize_frame_pixels(frame, 396, 314))
+                        #     (self.obs_width, self.obs_height),
+                        #     bytes(self._resize_frame_pixels(frame, self.obs_width, self.obs_height))
                         # )
                         # print("Save image")
                         # img.save('cm_output.png')
