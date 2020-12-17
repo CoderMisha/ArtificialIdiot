@@ -98,10 +98,11 @@ class NoobSaber(gym.Env):
             self.log_returns()
 
         # Get Observation
-        self.get_color_map_frames(world_state)
-        self.obs = self.get_observation(world_state)
+        cur_frame = self.get_color_map_frames(world_state)
+        # self.obs = self.get_observation(world_state)
 
-        return self.obs.flatten()
+        # return self.obs.flatten()
+        return self._resize_frame_pixels(cur_frame)
 
     def step(self, action_idx):
         """
@@ -118,7 +119,7 @@ class NoobSaber(gym.Env):
         """
         # Get Action
         action = self.action_list[action_idx]
-        self._make_action(action)
+        # self._make_action(action)
         time.sleep(.1)
         self.episode_step += 1
 
@@ -132,8 +133,8 @@ class NoobSaber(gym.Env):
         world_state = self.agent_host.getWorldState()
         for error in world_state.errors:
             print("Error:", error.text)
-        self.get_color_map_frames(world_state)
-        self.obs = self.get_observation(world_state)
+        cur_frame = self.get_color_map_frames(world_state)[0]
+        # self.obs = self.get_observation(world_state)
 
         # Get Reward
         reward = 0
@@ -141,7 +142,8 @@ class NoobSaber(gym.Env):
             reward += r.getValue()
         self.episode_return += reward
 
-        return self.obs.flatten(), reward, done, dict()
+        # return self.obs.flatten(), reward, done, dict()
+        return self._resize_frame_pixels(cur_frame), reward, done, dict()
 
     def get_mission_xml(self):
         return f'''<?xml version="1.0" encoding="UTF-8" ?>
@@ -287,13 +289,16 @@ class NoobSaber(gym.Env):
             if world_state.number_of_video_frames_since_last_state > 0:
                 for frame in world_state.video_frames:
                     if frame.frametype == MalmoPython.FrameType.COLOUR_MAP:
-                        img = Image.frombytes(
-                            'RGB',
-                            (self.video_width, self.video_height),
-                            bytes(frame.pixels)
-                        )
-                        img.save('cm_output.png')
-                        img.close()
+                        # img = Image.frombytes(
+                        #     'RGB',
+                        #     # (self.video_width, self.video_height),
+                        #     # bytes(frame.pixels)
+                        #     (396, 314),
+                        #     bytes(self._resize_frame_pixels(frame, 396, 314))
+                        # )
+                        # print("Save image")
+                        # img.save('cm_output.png')
+                        # img.close()
                         frames.append(frame)
                 break
 
@@ -378,6 +383,15 @@ class NoobSaber(gym.Env):
             pyautogui.move(-200, 0)
             pyautogui.press('enter')
 
+    def _resize_frame_pixels(self, frame, new_width_pixel, new_height_pixel):
+        pixel_array = np.array(list(bytes(frame.pixels)))
+        pixel_array = pixel_array.reshape((self.video_height, self.video_width * 3))
+        edge_height_pixel = int((self.video_height - new_height_pixel) / 2)
+        edge_width_pixel = int((self.video_width - new_width_pixel) / 2)
+        matrix_want = pixel_array[edge_height_pixel : (self.video_height - edge_height_pixel), 
+                                  edge_width_pixel * 3 : (self.video_width * 3 - edge_width_pixel * 3)]
+        
+        return matrix_want.flatten().tolist()
 
 if __name__ == '__main__':
     ray.init()
