@@ -57,7 +57,8 @@ class NoobSaber(gym.Env):
 
         # Rllib Parameters
         self.action_space = Discrete(len(self.action_list))
-        self.observation_space = Box(0, 1, shape=(np.prod([2, self.obs_size, self.obs_size]), ), dtype=np.int32)
+        # self.observation_space = Box(0, 1, shape=(np.prod([2, self.obs_size, self.obs_size]), ), dtype=np.int32)
+        self.observation_space = Box(0, 1, shape=(np.prod([1, self.obs_height, self.obs_width * 3]), ), dtype=np.int32)
 
         # Malmo Parameters
         self.video_width = 960
@@ -101,11 +102,14 @@ class NoobSaber(gym.Env):
             self.log_returns()
 
         # Get Observation
-        cur_frame = self.get_color_map_frames(world_state)
         # self.obs = self.get_observation(world_state)
-
         # return self.obs.flatten()
-        return self._resize_frame_pixels(cur_frame, self.obs_width, self.obs_height)
+        cur_frames = self.get_color_map_frames(world_state)
+        if len(cur_frames) <= 0:
+            return self._empty_obs()
+        else:
+            cur_frame = self._resize_frame_pixels(cur_frames[0], self.obs_width, self.obs_height)
+            return cur_frame
 
     def step(self, action_idx):
         """
@@ -122,6 +126,7 @@ class NoobSaber(gym.Env):
         """
         # Get Action
         action = self.action_list[action_idx]
+        print("action: ", action_idx)
         self._make_action(action)
         time.sleep(.1)
         self.episode_step += 1
@@ -136,7 +141,11 @@ class NoobSaber(gym.Env):
         world_state = self.agent_host.getWorldState()
         for error in world_state.errors:
             print("Error:", error.text)
-        cur_frame = self.get_color_map_frames(world_state)[0]
+        cur_frames = self.get_color_map_frames(world_state)
+        if len(cur_frames) <= 0:
+            cur_frame = self._empty_obs()
+        else:
+            cur_frame = self._resize_frame_pixels(cur_frames[0], self.obs_width, self.obs_height)
         # self.obs = self.get_observation(world_state)
 
         # Get Reward
@@ -146,7 +155,7 @@ class NoobSaber(gym.Env):
         self.episode_return += reward
 
         # return self.obs.flatten(), reward, done, dict()
-        return self._resize_frame_pixels(cur_frame, self.obs_width, self.obs_height), reward, done, dict()
+        return cur_frame, reward, done, dict()
 
     def get_mission_xml(self):
         return f'''<?xml version="1.0" encoding="UTF-8" ?>
@@ -393,8 +402,12 @@ class NoobSaber(gym.Env):
         edge_width_pixel = int((self.video_width - new_width_pixel) / 2)
         matrix_want = pixel_array[edge_height_pixel : (self.video_height - edge_height_pixel), 
                                   edge_width_pixel * 3 : (self.video_width * 3 - edge_width_pixel * 3)]
-        
+        print(len(matrix_want.flatten().tolist()))
         return matrix_want.flatten().tolist()
+
+    def _empty_obs(self):
+        print(len(np.zeros(self.obs_height * self.obs_width * 3).tolist()))
+        return np.zeros(self.obs_height * self.obs_width * 3).tolist()
 
 if __name__ == '__main__':
     ray.init()
