@@ -153,7 +153,7 @@ class NoobSaber(gym.Env):
         for r in world_state.rewards:
             reward += r.getValue()
         self.episode_return += reward
-
+        print("Reward:", reward)
         # return self.obs.flatten(), reward, done, dict()
         return cur_frame, reward, done, dict()
 
@@ -313,7 +313,7 @@ class NoobSaber(gym.Env):
                         # img.close()
                         frames.append(frame)
                 break
-
+        print("cur_frame:", len(frames), end = " | ")
         return frames
 
     def get_observation(self, world_state):
@@ -402,11 +402,11 @@ class NoobSaber(gym.Env):
         edge_width_pixel = int((self.video_width - new_width_pixel) / 2)
         matrix_want = pixel_array[edge_height_pixel : (self.video_height - edge_height_pixel), 
                                   edge_width_pixel * 3 : (self.video_width * 3 - edge_width_pixel * 3)]
-        print(len(matrix_want.flatten().tolist()))
+        print("Resized:", len(matrix_want.flatten().tolist()))
         return matrix_want.flatten().tolist()
 
     def _empty_obs(self):
-        print(len(np.zeros(self.obs_height * self.obs_width * 3).tolist()))
+        print("Empty obs:", len(np.zeros(self.obs_height * self.obs_width * 3).tolist()))
         return np.zeros(self.obs_height * self.obs_width * 3).tolist()
 
 if __name__ == '__main__':
@@ -421,4 +421,5 @@ if __name__ == '__main__':
     })
 
     while True:
-        print(trainer.train())
+        print("======Start======")
+        print("Train:", trainer.train())
