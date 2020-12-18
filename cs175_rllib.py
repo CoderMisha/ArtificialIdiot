@@ -58,7 +58,7 @@ class NoobSaber(gym.Env):
         # Rllib Parameters
         self.action_space = Discrete(len(self.action_list))
         # self.observation_space = Box(0, 1, shape=(np.prod([2, self.obs_size, self.obs_size]), ), dtype=np.int32)
-        self.observation_space = Box(0, 1, shape=(np.prod([1, self.obs_height, self.obs_width * 3]), ), dtype=np.int32)
+        self.observation_space = Box(0, 255, shape=(np.prod([1, self.obs_height, self.obs_width * 3]), ), dtype=np.int32)
 
         # Malmo Parameters
         self.video_width = 960
@@ -135,6 +135,7 @@ class NoobSaber(gym.Env):
         done = False
         if self.episode_step >= self.max_episode_steps or not self.agent_host.getWorldState().is_mission_running:
             done = True
+            pyautogui.press('enter')
             time.sleep(2)
 
         # Get Observation
@@ -161,7 +162,7 @@ class NoobSaber(gym.Env):
         return f'''<?xml version="1.0" encoding="UTF-8" ?>
         <Mission xmlns="http://ProjectMalmo.microsoft.com" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
             <About>
-                <Summary>CS 175 World Drawing</Summary>
+                <Summary>CS 175</Summary>
             </About>
 
             <ServerSection>
@@ -282,7 +283,7 @@ class NoobSaber(gym.Env):
         time.sleep(0.1)
         pyautogui.move(-200, 0)
 
-        pyautogui.press('enter')
+        # pyautogui.press('enter')
 
         return world_state
 
@@ -370,7 +371,7 @@ class NoobSaber(gym.Env):
         returns_smooth = np.convolve(self.returns, box, mode='same')
         plt.clf()
         plt.plot(self.steps, returns_smooth)
-        plt.title('Diamond Collector')
+        plt.title('NoobSaber')
         plt.ylabel('Return')
         plt.xlabel('Steps')
         plt.savefig('returns.png')
@@ -383,24 +384,24 @@ class NoobSaber(gym.Env):
         if action == NoobSaberAction.NOP:
             pass
         elif action == NoobSaberAction.ATTACK_LEFT:
-            pyautogui.press('enter')
+            # pyautogui.press('enter')
             pyautogui.move(-200, 0)
             self.agent_host.sendCommand('attack 1')
             pyautogui.move(200, 0)
-            pyautogui.press('enter')
+            # pyautogui.press('enter')
         elif action == NoobSaberAction.ATTACK_RIGHT:
-            pyautogui.press('enter')
+            # pyautogui.press('enter')
             pyautogui.move(200, 0)
             self.agent_host.sendCommand('attack 1')
             pyautogui.move(-200, 0)
-            pyautogui.press('enter')
+            # pyautogui.press('enter')
 
     def _resize_frame_pixels(self, frame, new_width_pixel, new_height_pixel):
         pixel_array = np.array(list(bytes(frame.pixels)))
         pixel_array = pixel_array.reshape((self.video_height, self.video_width * 3))
         edge_height_pixel = int((self.video_height - new_height_pixel) / 2)
         edge_width_pixel = int((self.video_width - new_width_pixel) / 2)
-        matrix_want = pixel_array[edge_height_pixel : (self.video_height - edge_height_pixel), 
+        matrix_want = pixel_array[edge_height_pixel : (self.video_height - edge_height_pixel),
                                   edge_width_pixel * 3 : (self.video_width * 3 - edge_width_pixel * 3)]
         print("Resized:", len(matrix_want.flatten().tolist()))
         return matrix_want.flatten().tolist()
