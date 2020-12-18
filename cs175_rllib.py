@@ -150,13 +150,14 @@ class NoobSaber(gym.Env):
         # self.obs = self.get_observation(world_state)
 
         # Get Reward
-        reward = 0
-        for r in world_state.rewards:
-            reward += r.getValue()
-        self.episode_return += reward
-        print("Reward:", reward)
+        # reward = 0
+        # for r in world_state.rewards:
+        #     reward += r.getValue()
+        # self.episode_return += reward
+        # print("Reward:", reward)
+
         # return self.obs.flatten(), reward, done, dict()
-        return cur_frame, reward, done, dict()
+        return cur_frame, self.episode_return, done, dict()
 
     def get_mission_xml(self):
         return f'''<?xml version="1.0" encoding="UTF-8" ?>
@@ -300,6 +301,26 @@ class NoobSaber(gym.Env):
                 raise RuntimeError('Could not load color map frame(s).')
 
             if world_state.number_of_video_frames_since_last_state > 0:
+                reward = 0
+
+                if len(world_state.observations) > 0:
+                    msg = world_state.observations[-1].text
+                    observations = json.loads(msg)
+
+                    if observations['Hotbar_3_item'] == 'wool' and observations['Hotbar_3_colour'] == 'YELLOW':
+                        reward -= observations['Hotbar_3_size']
+                    elif observations['Hotbar_4_item'] == 'wool' and observations['Hotbar_4_colour'] == 'YELLOW':
+                        reward -= observations['Hotbar_4_size']
+                    
+                    if observations['Hotbar_3_item'] == 'wool' and observations['Hotbar_3_colour'] == 'LIGHT_BLUE':
+                        reward += observations['Hotbar_3_size']
+                    elif observations['Hotbar_4_item'] == 'wool' and observations['Hotbar_4_colour'] == 'LIGHT_BLUE':
+                        reward += observations['Hotbar_4_size']
+                    
+                    print(reward)
+                    
+                    self.episode_return = reward
+
                 for frame in world_state.video_frames:
                     if frame.frametype == MalmoPython.FrameType.COLOUR_MAP:
                         # img = Image.frombytes(

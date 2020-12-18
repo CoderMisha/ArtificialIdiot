@@ -190,20 +190,23 @@ def draw_finish_line(entry_x: int, entry_y: int, entry_z: int) -> Tuple[str, Tup
 map_generated = _draw_cuboid(-256, 256, -256, 256, -256, 256, "air")
 xml, next_start = draw_starting_point(0, 10, 0)
 
-map_generated += xml
-xml, next_start = draw_branch_left(*next_start)
+# map_generated += xml
+# xml, next_start = draw_branch_left(*next_start)
+
+# map_generated += xml
+# xml, next_start = draw_branch_left(*next_start)
+
+# map_generated += xml
+# xml, next_start = draw_rail_line_with_beats(*next_start, 20)
+
+# map_generated += xml
+# xml, next_start = draw_branch_left(*next_start)
+
+# map_generated += xml
+# xml, next_start = draw_rail_line_with_beats(*next_start, 20)
 
 map_generated += xml
-xml, next_start = draw_branch_left(*next_start)
-
-map_generated += xml
-xml, next_start = draw_rail_line_with_beats(*next_start, 20)
-
-map_generated += xml
-xml, next_start = draw_branch_left(*next_start)
-
-map_generated += xml
-xml, next_start = draw_rail_line_with_beats(*next_start, 20)
+xml, next_start = draw_rail_line_with_beats(*next_start, 500)
 
 map_generated += xml
 xml, _ = draw_finish_line(*next_start)
