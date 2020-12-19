@@ -48,7 +48,7 @@ class NoobSaber(gym.Env):
         self.reward_density = .1
         self.penalty_density = .02
         self.obs_size = 5
-        self.max_episode_steps = 30 #100
+        self.max_episode_steps = 15 #100
         self.log_frequency = 10
         self.action_list = list(NoobSaberAction)
 
@@ -126,10 +126,12 @@ class NoobSaber(gym.Env):
         """
         pyautogui.press('enter')
         # Get Action
+        if action_idx == 0: 
+            action_idx = 1
         action = self.action_list[action_idx]
         print("action: ", action_idx)
         self._make_action(action)
-        time.sleep(.1)
+        #time.sleep(.05)
         self.episode_step += 1
         print("====New Step====", self.episode_step)
 
@@ -210,15 +212,14 @@ class NoobSaber(gym.Env):
                     </ObservationFromGrid>
                     <InventoryCommands/>
                     <RewardForTouchingBlockType>
-                        <Block type="water" reward="1000" />
-                        <Block type="lava" reward="-1000" />
+                        <Block type="water" reward="100" />
+                        <Block type="lava" reward="-100" />
                     </RewardForTouchingBlockType>
-                    
+                    <!-- <RewardForTimeTaken initialReward="0" delta="0.1" density="PER_TICK" /> --> 
                     <RewardForCollectingItem>
-                        <Item type="diamond" reward="2" />
                         <Item type="redstone_block" reward="1" />
-                        <Item reward="3" type="wool" colour="LIGHT_BLUE" />
-                        <Item reward="4" type="wool" colour="YELLOW" />
+                        <Item reward="5" type="wool" colour="LIGHT_BLUE" />
+                        <Item reward="10" type="wool" colour="YELLOW" />
                     </RewardForCollectingItem>
                     <RewardForMissionEnd rewardForDeath="-100">
                         <Reward reward="10000" description="Mission End"/>
@@ -392,19 +393,20 @@ class NoobSaber(gym.Env):
                 f.write("{}\t{}\n".format(step, value))
 
     def _make_action(self, action: NoobSaberAction):
+        delay = 0.1
         if action == NoobSaberAction.NOP:
             pass
         elif action == NoobSaberAction.ATTACK_LEFT:
             # pyautogui.press('enter')
-            pyautogui.move(-200, 0)
-            self.agent_host.sendCommand('attack 1')
-            pyautogui.move(200, 0)
+            pyautogui.move(-300, 0)
+            self.agent_host.sendCommand('attack 1'); time.sleep(delay)
+            pyautogui.move(300, 0)
             # pyautogui.press('enter')
         elif action == NoobSaberAction.ATTACK_RIGHT:
             # pyautogui.press('enter')
-            pyautogui.move(200, 0)
-            self.agent_host.sendCommand('attack 1')
-            pyautogui.move(-200, 0)
+            pyautogui.move(300, 0)
+            self.agent_host.sendCommand('attack 1'); time.sleep(delay)
+            pyautogui.move(-300, 0)
             # pyautogui.press('enter')
 
     def _resize_frame_pixels(self, frame, new_width_pixel, new_height_pixel):
