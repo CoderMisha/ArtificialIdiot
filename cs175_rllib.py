@@ -130,6 +130,7 @@ class NoobSaber(gym.Env):
         self._make_action(action)
         time.sleep(.1)
         self.episode_step += 1
+        print("====New Step====", self.episode_step)
 
         # Get Done
         done = False
@@ -137,7 +138,9 @@ class NoobSaber(gym.Env):
             done = True
             pyautogui.press('enter')
             time.sleep(2)
+            print("====Done====", self.returns, self.episode_return)
 
+        pyautogui.press('enter')
         # Get Observation
         world_state = self.agent_host.getWorldState()
         for error in world_state.errors:
@@ -151,11 +154,14 @@ class NoobSaber(gym.Env):
 
         # Get Reward
         reward = 0
+        print("world state,", world_state)
         for r in world_state.rewards:
+            print(r, "+++",r.getValue())
             reward += r.getValue()
         self.episode_return += reward
         print("Reward:", reward)
         # return self.obs.flatten(), reward, done, dict()
+        pyautogui.press('enter')
         return cur_frame, reward, done, dict()
 
     def get_mission_xml(self):
@@ -209,17 +215,21 @@ class NoobSaber(gym.Env):
                     </RewardForTouchingBlockType>
                     <RewardForTimeTaken initialReward="0" delta="0.1" density="PER_TICK" />
                     <RewardForCollectingItem>
+                        <Item type="redstone_block" reward="1" />
                         <Item reward="50" type="wool" colour="LIGHT_BLUE" />
                         <Item reward="60" type="wool" colour="YELLOW" />
                     </RewardForCollectingItem>
+                    <RewardForMissionEnd rewardForDeath="-100">
+                        <Reward reward="10" description="Mission End"/>
+                    </RewardForMissionEnd>
                     <ColourMapProducer>
                         <Width>{self.video_width}</Width>
                         <Height>{self.video_height}</Height>
                     </ColourMapProducer>
-                    <AgentQuitFromReachingCommandQuota total="{self.max_episode_steps + 1}" />
+                    <AgentQuitFromReachingCommandQuota total="{self.max_episode_steps}" />
                     <AgentQuitFromTouchingBlockType>
-                        <Block type="water" description="success"/>
-                        <Block type="lava" description="dead end"/>
+                        <Block type="water" description="success" />
+                        <Block type="lava" description="dead end" />
                     </AgentQuitFromTouchingBlockType>
                 </AgentHandlers>
             </AgentSection>
@@ -238,7 +248,7 @@ class NoobSaber(gym.Env):
         my_clients = MalmoPython.ClientPool()
         # add Minecraft machines here as available
         my_clients.add(MalmoPython.ClientInfo('127.0.0.1', 10000))
-        time.sleep(10)
+        #time.sleep(2)
 
         for retry in range(max_retries):
             try:
