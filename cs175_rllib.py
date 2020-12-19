@@ -31,12 +31,16 @@ class NoobSaberAction(enum.Enum):
     NOP = 0
     ATTACK_LEFT = 1
     ATTACK_RIGHT = 2
+    SWITCH = 3
+
 
     def short_name(self):
         if self == NoobSaberAction.NOP:
             return 'NOP'
-        if self == NoobSaberAction.ATTACK_LEFT:
+        elif self == NoobSaberAction.ATTACK_LEFT:
             return 'ATK_L'
+        elif self == NoobSaberAction.SWITCH:
+            return 'SWITCH'
         
         return 'ATK_R'  # ATTACK_RIGHT
 
@@ -48,7 +52,7 @@ class NoobSaber(gym.Env):
         self.reward_density = .1
         self.penalty_density = .02
         self.obs_size = 5
-        self.max_episode_steps = 15 #100
+        self.max_episode_steps = 100
         self.log_frequency = 10
         self.action_list = list(NoobSaberAction)
 
@@ -77,6 +81,7 @@ class NoobSaber(gym.Env):
         self.episode_return = 0
         self.returns = []
         self.steps = []
+        self.pickaxe = 0 # 0: hotbar.1 ; 1:hotbar.2
 
     def reset(self):
         """
@@ -126,8 +131,8 @@ class NoobSaber(gym.Env):
         """
         pyautogui.press('enter')
         # Get Action
-        if action_idx == 0: 
-            action_idx = 1
+        if action_idx == 0: # change "do nothing" to "switch pickaxe"
+            action_idx = 3
         action = self.action_list[action_idx]
         print("action: ", action_idx)
         self._make_action(action)
@@ -160,11 +165,21 @@ class NoobSaber(gym.Env):
         print("world state,", world_state)
         for r in world_state.rewards:
             print(r, "+++",r.getValue())
-            reward += r.getValue()
+            reward += self.apply_reward(r.getValue())
         self.episode_return += reward
         print("Reward:", reward)
         # return self.obs.flatten(), reward, done, dict()
         return cur_frame, reward, done, dict()
+    
+    def apply_reward(self, reward):
+        good_score, bad_score = 10, -1
+        if reward == 55: # "blue block"
+            return good_score if self.pickaxe == 0 else bad_score
+        elif reward == 66: # "yellow block"
+            return good_score if self.pickaxe != 0 else bad_score
+        else:
+            return reward
+
 
     def get_mission_xml(self):
         return f'''<?xml version="1.0" encoding="UTF-8" ?>
@@ -218,8 +233,8 @@ class NoobSaber(gym.Env):
                     <!-- <RewardForTimeTaken initialReward="0" delta="0.1" density="PER_TICK" /> --> 
                     <RewardForCollectingItem>
                         <Item type="redstone_block" reward="1" />
-                        <Item reward="5" type="wool" colour="LIGHT_BLUE" />
-                        <Item reward="10" type="wool" colour="YELLOW" />
+                        <Item reward="55" type="wool" colour="LIGHT_BLUE" />
+                        <Item reward="66" type="wool" colour="YELLOW" />
                     </RewardForCollectingItem>
                     <RewardForMissionEnd rewardForDeath="-100">
                         <Reward reward="10000" description="Mission End"/>
@@ -393,21 +408,32 @@ class NoobSaber(gym.Env):
                 f.write("{}\t{}\n".format(step, value))
 
     def _make_action(self, action: NoobSaberAction):
-        delay = 0.1
+        delay = 0.07
         if action == NoobSaberAction.NOP:
             pass
         elif action == NoobSaberAction.ATTACK_LEFT:
             # pyautogui.press('enter')
-            pyautogui.move(-300, 0)
+            pyautogui.move(-200, 0)
             self.agent_host.sendCommand('attack 1'); time.sleep(delay)
-            pyautogui.move(300, 0)
+            pyautogui.move(200, 0)
             # pyautogui.press('enter')
         elif action == NoobSaberAction.ATTACK_RIGHT:
             # pyautogui.press('enter')
-            pyautogui.move(300, 0)
+            pyautogui.move(200, 0)
             self.agent_host.sendCommand('attack 1'); time.sleep(delay)
-            pyautogui.move(-300, 0)
+            pyautogui.move(-200, 0)
             # pyautogui.press('enter')
+        elif action == NoobSaberAction.SWITCH:
+            pyautogui.press('enter')
+            if self.pickaxe == 0:
+                #print("==========================================Swicth To Yellow")
+                self.agent_host.sendCommand('hotbar.2 1'); time.sleep(delay)
+                self.pickaxe += 1
+            else:
+                #print("==========================================Swicth To Blue")
+                self.agent_host.sendCommand('hotbar.1 1'); time.sleep(delay)
+                self.pickaxe = 0
+            pyautogui.press('enter')
 
     def _resize_frame_pixels(self, frame, new_width_pixel, new_height_pixel):
         pixel_array = np.array(list(bytes(frame.pixels)))
