@@ -36,12 +36,26 @@ def _draw_red_stone_and_golden_rail_as_line(x1: int, x2: int, y1: int, y2: int, 
 
 def _generate_beats(x1: int, x2: int, y: int, z: int, prob: float):
     ret = ''
+    draw_counter = 0
+    drawing_z = z
+    drawing_color = ''
 
     for x in range(x1, x2, + 1):
-        if random.random() > prob:
-            ret += _draw_block(x, y + 1, z - 1, 'air')
-        if random.random() > prob:
-            ret += _draw_block(x, y + 1, z + 1, 'air')
+        if draw_counter > 0:
+            ret += _draw_block(x, y + 1, drawing_z, 'wool', colour=drawing_color)
+            
+            draw_counter -= 1
+        
+        elif random.random() > prob:
+            draw_counter = 3
+            drawing_z = z - 1 if random.random() >= 0.5 else z + 1
+            drawing_color = 'LIGHT_BLUE' if random.random() >= 0.5 else 'YELLOW'
+            ret += _draw_block(x, y + 1, drawing_z, 'wool', colour=drawing_color)
+
+        # if random.random() > prob:
+        #     ret += _draw_block(x, y + 1, z - 1, 'wool', colour="LIGHT_BLUE")
+        # if random.random() > prob:
+        #     ret += _draw_block(x, y + 1, z + 1, 'wool', colour='YELLOW')
     
     return ret
 
@@ -135,9 +149,11 @@ def draw_rail_line_with_beats(entry_x: int, entry_y: int, entry_z: int, length: 
     
     <!--Drawing-->
     {_draw_red_stone_and_golden_rail_as_line(entry_x, entry_x + length, entry_y, entry_y, entry_z, entry_z)}
-    {_draw_line(entry_x, entry_x + length, entry_y + 1, entry_y + 1, entry_z - 1, entry_z - 1, "wool", colour="YELLOW")}
-    {_draw_line(entry_x, entry_x + length, entry_y + 1, entry_y + 1, entry_z + 1, entry_z + 1, "wool", colour="LIGHT_BLUE")}
-    {_generate_beats(entry_x, entry_x + length, entry_y, entry_z, 1)}
+    {_draw_line(entry_x, entry_x + length, entry_y + 1, entry_y + 1, entry_z - 1, entry_z - 1, "air")}
+    {_draw_line(entry_x, entry_x + length, entry_y + 1, entry_y + 1, entry_z + 1, entry_z + 1, "air")}
+    <!-- {_draw_line(entry_x, entry_x + length, entry_y + 1, entry_y + 1, entry_z - 1, entry_z - 1, "wool", colour="YELLOW")} -->
+    <!-- {_draw_line(entry_x, entry_x + length, entry_y + 1, entry_y + 1, entry_z + 1, entry_z + 1, "wool", colour="LIGHT_BLUE")} -->
+    {_generate_beats(entry_x, entry_x + length, entry_y, entry_z, 0.5)}
     ''', (entry_x + length + 1, entry_y, entry_z)
 
 
