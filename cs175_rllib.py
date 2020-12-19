@@ -8,7 +8,6 @@ except:
 
 import sys
 import time
-import json
 import enum
 import matplotlib.pyplot as plt
 import numpy as np
@@ -16,7 +15,8 @@ import numpy as np
 import gym
 import ray
 from gym.spaces import Discrete, Box
-from ray.rllib.agents import ppo
+from ray.rllib.models import ModelCatalog
+from ray.rllib.agents import ppo, dqn, trainer
 import pyautogui
 from PIL import Image
 
@@ -25,22 +25,23 @@ from PIL import Image
 # moving 15 degrees in game (at least on my computer)
 
 import cs175_drawing
+from cs175_model import NoobSaberTorchModel
+ModelCatalog.register_custom_model('my_model', NoobSaberTorchModel)
 
 
 class NoobSaberAction(enum.Enum):
     NOP = 0
     ATTACK_LEFT = 1
     ATTACK_RIGHT = 2
-    SWITCH = 3
-
+    #SWITCH = 3
 
     def short_name(self):
         if self == NoobSaberAction.NOP:
             return 'NOP'
         elif self == NoobSaberAction.ATTACK_LEFT:
             return 'ATK_L'
-        elif self == NoobSaberAction.SWITCH:
-            return 'SWITCH'
+        #elif self == NoobSaberAction.SWITCH:
+        #    return 'SWITCH'
         
         return 'ATK_R'  # ATTACK_RIGHT
 
@@ -52,7 +53,7 @@ class NoobSaber(gym.Env):
         self.reward_density = .1
         self.penalty_density = .02
         self.obs_size = 5
-        self.max_episode_steps = 100
+        self.max_episode_steps = 500
         self.log_frequency = 10
         self.action_list = list(NoobSaberAction)
 
@@ -61,8 +62,7 @@ class NoobSaber(gym.Env):
 
         # Rllib Parameters
         self.action_space = Discrete(len(self.action_list))
-        # self.observation_space = Box(0, 1, shape=(np.prod([2, self.obs_size, self.obs_size]), ), dtype=np.int32)
-        self.observation_space = Box(0, 255, shape=(np.prod([1, self.obs_height, self.obs_width * 3]), ), dtype=np.int32)
+        self.observation_space = Box(0, 255, shape=(self.obs_height, self.obs_width, 3), dtype=np.int32)
 
         # Malmo Parameters
         self.video_width = 960
@@ -100,20 +100,16 @@ class NoobSaber(gym.Env):
         self.episode_return = 0
         self.episode_step = 0
 
-        # TODO: Reset mouse movement
-
         # Log
         if len(self.returns) > self.log_frequency and len(self.returns) % self.log_frequency == 0:
             self.log_returns()
 
         # Get Observation
-        # self.obs = self.get_observation(world_state)
-        # return self.obs.flatten()
         cur_frames = self.get_color_map_frames(world_state)
         if len(cur_frames) <= 0:
             return self._empty_obs()
         else:
-            cur_frame = self._resize_frame_pixels(cur_frames[0], self.obs_width, self.obs_height)
+            cur_frame = self._resize_frame_pixels(cur_frames[0])
             return cur_frame
 
     def step(self, action_idx):
@@ -129,25 +125,25 @@ class NoobSaber(gym.Env):
             done: <bool> indicates terminal state
             info: <dict> dictionary of extra information
         """
-        pyautogui.press('enter')
+        #pyautogui.press('enter')
         # Get Action
-        if action_idx == 0: # change "do nothing" to "switch pickaxe"
-            action_idx = 3
+        # if action_idx == 0: # change "do nothing" to "switch pickaxe"
+        #     action_idx = 3
         action = self.action_list[action_idx]
         print("action: ", action_idx)
         self._make_action(action)
-        #time.sleep(.05)
         self.episode_step += 1
         print("====New Step====", self.episode_step)
 
         world_state = self.agent_host.getWorldState()
         for error in world_state.errors:
             print("Error:", error.text)
-        pyautogui.press('enter')
+        #pyautogui.press('enter')
 
         # Get Done
         done = False
         if self.episode_step >= self.max_episode_steps or not world_state.is_mission_running:
+            pyautogui.press('enter')
             done = True
             time.sleep(2)
             print("====Done====", self.returns, self.episode_return)
@@ -157,8 +153,7 @@ class NoobSaber(gym.Env):
         if len(cur_frames) <= 0:
             cur_frame = self._empty_obs()
         else:
-            cur_frame = self._resize_frame_pixels(cur_frames[0], self.obs_width, self.obs_height)
-        # self.obs = self.get_observation(world_state)
+            cur_frame = self._resize_frame_pixels(cur_frames[0])
 
         # Get Reward
         reward = 0
@@ -168,7 +163,6 @@ class NoobSaber(gym.Env):
             reward += self.apply_reward(r.getValue())
         self.episode_return += reward
         print("Reward:", reward)
-        # return self.obs.flatten(), reward, done, dict()
         return cur_frame, reward, done, dict()
     
     def apply_reward(self, reward):
@@ -215,6 +209,7 @@ class NoobSaber(gym.Env):
                 </AgentStart>
                 <AgentHandlers>
                     <DiscreteMovementCommands/>
+                    <ChatCommands/>
                     <ObservationFromFullStats/>
                     <ObservationFromHotBar/>
                     <ObservationFromFullInventory/>
@@ -227,23 +222,23 @@ class NoobSaber(gym.Env):
                     </ObservationFromGrid>
                     <InventoryCommands/>
                     <RewardForTouchingBlockType>
-                        <Block type="water" reward="100" />
+                        <Block type="water" reward="1" />
                         <Block type="lava" reward="-100" />
                     </RewardForTouchingBlockType>
                     <!-- <RewardForTimeTaken initialReward="0" delta="0.1" density="PER_TICK" /> --> 
                     <RewardForCollectingItem>
                         <Item type="redstone_block" reward="1" />
-                        <Item reward="55" type="wool" colour="LIGHT_BLUE" />
-                        <Item reward="66" type="wool" colour="YELLOW" />
+                        <Item reward="50" type="wool" colour="LIGHT_BLUE" />
+                        <Item reward="-60" type="wool" colour="YELLOW" />
                     </RewardForCollectingItem>
                     <RewardForMissionEnd rewardForDeath="-100">
-                        <Reward reward="10000" description="Mission End"/>
+                        <Reward reward="1" description="Mission End"/>
                     </RewardForMissionEnd>
                     <ColourMapProducer>
                         <Width>{self.video_width}</Width>
                         <Height>{self.video_height}</Height>
                     </ColourMapProducer>
-                    <AgentQuitFromReachingCommandQuota total="{self.max_episode_steps}" />
+                    <!-- <AgentQuitFromReachingCommandQuota total="{self.max_episode_steps}" /> -->
                     <AgentQuitFromTouchingBlockType>
                         <Block type="water" description="success" />
                         <Block type="lava" description="dead end" />
@@ -265,7 +260,6 @@ class NoobSaber(gym.Env):
         my_clients = MalmoPython.ClientPool()
         # add Minecraft machines here as available
         my_clients.add(MalmoPython.ClientInfo('127.0.0.1', 10000))
-        #time.sleep(2)
 
         for retry in range(max_retries):
             try:
@@ -293,6 +287,10 @@ class NoobSaber(gym.Env):
 
         pyautogui.press('enter')
         pyautogui.rightClick()
+        pyautogui.rightClick()
+        pyautogui.rightClick()
+        pyautogui.rightClick()
+        pyautogui.rightClick()
 
         # head's up
         pyautogui.move(0, -200)
@@ -310,7 +308,7 @@ class NoobSaber(gym.Env):
         time.sleep(0.1)
         pyautogui.move(-200, 0)
 
-        pyautogui.press('enter')
+        #pyautogui.press('enter')
 
         return world_state
 
@@ -329,62 +327,10 @@ class NoobSaber(gym.Env):
             if world_state.number_of_video_frames_since_last_state > 0:
                 for frame in world_state.video_frames:
                     if frame.frametype == MalmoPython.FrameType.COLOUR_MAP:
-                        # img = Image.frombytes(
-                        #     'RGB',
-                        #     # (self.video_width, self.video_height),
-                        #     # bytes(frame.pixels)
-                        #     (self.obs_width, self.obs_height),
-                        #     bytes(self._resize_frame_pixels(frame, self.obs_width, self.obs_height))
-                        # )
-                        # print("Save image")
-                        # img.save('cm_output.png')
-                        # img.close()
                         frames.append(frame)
                 break
         print("cur_frame:", len(frames), end = " | ")
         return frames
-
-    def get_observation(self, world_state):
-        """
-        Use the agent observation API to get a 2 x 5 x 5 grid around the agent. 
-        The agent is in the center square facing up.
-
-        Args
-            world_state: <object> current agent world state
-
-        Returns
-            observation: <np.array>
-        """
-        obs = np.zeros((2, self.obs_size, self.obs_size))
-
-        while world_state.is_mission_running:
-            time.sleep(0.1)
-            world_state = self.agent_host.getWorldState()
-            if len(world_state.errors) > 0:
-                raise AssertionError('Could not load grid.')
-
-            if world_state.number_of_observations_since_last_state > 0:
-                # First we get the json from the observation API
-                msg = world_state.observations[-1].text
-                observations = json.loads(msg)
-
-                # Get observation
-                grid = observations['floorAll']
-                grid_binary = [1 if x == 'diamond_ore' or x == 'lava' else 0 for x in grid]
-                obs = np.reshape(grid_binary, (2, self.obs_size, self.obs_size))
-
-                # Rotate observation with orientation of agent
-                yaw = observations['Yaw']
-                if yaw == 270:
-                    obs = np.rot90(obs, k=1, axes=(1, 2))
-                elif yaw == 0:
-                    obs = np.rot90(obs, k=2, axes=(1, 2))
-                elif yaw == 90:
-                    obs = np.rot90(obs, k=3, axes=(1, 2))
-
-                break
-
-        return obs
 
     def log_returns(self):
         """
@@ -408,56 +354,67 @@ class NoobSaber(gym.Env):
                 f.write("{}\t{}\n".format(step, value))
 
     def _make_action(self, action: NoobSaberAction):
-        delay = 0.07
+        #delay = 0.07
         if action == NoobSaberAction.NOP:
-            pass
+            self.agent_host.sendCommand('chat .')
         elif action == NoobSaberAction.ATTACK_LEFT:
-            # pyautogui.press('enter')
             pyautogui.move(-200, 0)
-            self.agent_host.sendCommand('attack 1'); time.sleep(delay)
+            self.agent_host.sendCommand('attack 1')#; time.sleep(delay)
             pyautogui.move(200, 0)
-            # pyautogui.press('enter')
         elif action == NoobSaberAction.ATTACK_RIGHT:
-            # pyautogui.press('enter')
             pyautogui.move(200, 0)
-            self.agent_host.sendCommand('attack 1'); time.sleep(delay)
+            self.agent_host.sendCommand('attack 1')#; time.sleep(delay)
             pyautogui.move(-200, 0)
-            # pyautogui.press('enter')
-        elif action == NoobSaberAction.SWITCH:
-            pyautogui.press('enter')
-            if self.pickaxe == 0:
-                #print("==========================================Swicth To Yellow")
-                self.agent_host.sendCommand('hotbar.2 1'); time.sleep(delay)
-                self.pickaxe += 1
-            else:
-                #print("==========================================Swicth To Blue")
-                self.agent_host.sendCommand('hotbar.1 1'); time.sleep(delay)
-                self.pickaxe = 0
-            pyautogui.press('enter')
+        # elif action == NoobSaberAction.SWITCH:
+        #     pyautogui.press('enter')
+        #     if self.pickaxe == 0:
+        #         self.agent_host.sendCommand('hotbar.2 1'); time.sleep(delay)
+        #         self.pickaxe += 1
+        #     else:
+        #         self.agent_host.sendCommand('hotbar.1 1'); time.sleep(delay)
+        #         self.pickaxe = 0
+        #     pyautogui.press('enter')
 
-    def _resize_frame_pixels(self, frame, new_width_pixel, new_height_pixel):
-        pixel_array = np.array(list(bytes(frame.pixels)))
-        pixel_array = pixel_array.reshape((self.video_height, self.video_width * 3))
-        edge_height_pixel = int((self.video_height - new_height_pixel) / 2)
-        edge_width_pixel = int((self.video_width - new_width_pixel) / 2)
-        matrix_want = pixel_array[edge_height_pixel : (self.video_height - edge_height_pixel),
-                                  edge_width_pixel * 3 : (self.video_width * 3 - edge_width_pixel * 3)]
-        print("Resized:", len(matrix_want.flatten().tolist()))
-        return matrix_want.flatten().tolist()
+    def _resize_frame_pixels(self, frame):
+        img = Image.frombytes(
+            'RGB',
+            (self.video_width, self.video_height),
+            bytes(frame.pixels)
+        )
+
+        resized = img.resize((self.obs_width, self.obs_height))
+
+        resized_arr = np.array(resized)
+
+        img.close()
+        resized.close()
+        return resized_arr
 
     def _empty_obs(self):
-        print("Empty obs:", len(np.zeros(self.obs_height * self.obs_width * 3).tolist()))
-        return np.zeros(self.obs_height * self.obs_width * 3).tolist()
+        return np.zeros((self.obs_height, self.obs_width, 3), dtype=np.uint8)
 
 if __name__ == '__main__':
     ray.init()
-    trainer = ppo.PPOTrainer(env=NoobSaber, config={
-        'env_config': {},           # No environment parameters to configure
-        'framework': 'torch',         # Use tensorflow
-        'num_gpus': 0,              # ? If possible, use GPUs
-        'num_workers': 0,           # We aren't using parallelism
-        # "train_batch_size": 100,
-        # "sgd_minibatch_size": 64,
+    # trainer = ppo.PPOTrainer(env=NoobSaber, config={
+    #     'env_config': {},           # No environment parameters to configure
+    #     'framework': 'torch',         # Use tensorflow
+    #     'num_gpus': 0,              # ? If possible, use GPUs
+    #     'num_workers': 0,           # We aren't using parallelism
+    #     'model': {
+    #         'custom_model': 'my_model',
+    #         'custom_model_config': {},
+    #     }
+    # })
+
+    trainer = dqn.DQNTrainer(env=NoobSaber, config={
+        'env_config': {},
+        'framework': 'torch',
+        'num_gpus': 0,
+        'num_workers': 0,
+        'model': {
+            'custom_model': 'my_model',
+            'custom_model_config': {},
+        }
     })
 
     while True:

@@ -135,9 +135,9 @@ def draw_rail_line_with_beats(entry_x: int, entry_y: int, entry_z: int, length: 
     
     <!--Drawing-->
     {_draw_red_stone_and_golden_rail_as_line(entry_x, entry_x + length, entry_y, entry_y, entry_z, entry_z)}
-    {_draw_line(entry_x, entry_x + length, entry_y + 1, entry_y + 1, entry_z - 1, entry_z - 1, "wool", colour="LIGHT_BLUE")}
-    {_draw_line(entry_x, entry_x + length, entry_y + 1, entry_y + 1, entry_z + 1, entry_z + 1, "wool", colour="YELLOW")}
-    {_generate_beats(entry_x, entry_x + length, entry_y, entry_z, 0.1)}
+    {_draw_line(entry_x, entry_x + length, entry_y + 1, entry_y + 1, entry_z - 1, entry_z - 1, "wool", colour="YELLOW")}
+    {_draw_line(entry_x, entry_x + length, entry_y + 1, entry_y + 1, entry_z + 1, entry_z + 1, "wool", colour="LIGHT_BLUE")}
+    {_generate_beats(entry_x, entry_x + length, entry_y, entry_z, 1)}
     ''', (entry_x + length + 1, entry_y, entry_z)
 
 
@@ -190,20 +190,20 @@ def draw_finish_line(entry_x: int, entry_y: int, entry_z: int) -> Tuple[str, Tup
 map_generated = _draw_cuboid(-256, 256, -256, 256, -256, 256, "air")
 xml, next_start = draw_starting_point(0, 10, 0)
 
-map_generated += xml
-xml, next_start = draw_branch_left(*next_start)
+# map_generated += xml
+# xml, next_start = draw_branch_left(*next_start)
+
+# map_generated += xml
+# xml, next_start = draw_branch_left(*next_start)
+
+# map_generated += xml
+# xml, next_start = draw_rail_line_with_beats(*next_start, 20)
+
+# map_generated += xml
+# xml, next_start = draw_branch_left(*next_start)
 
 map_generated += xml
-xml, next_start = draw_branch_left(*next_start)
-
-map_generated += xml
-xml, next_start = draw_rail_line_with_beats(*next_start, 20)
-
-map_generated += xml
-xml, next_start = draw_branch_left(*next_start)
-
-map_generated += xml
-xml, next_start = draw_rail_line_with_beats(*next_start, 20)
+xml, next_start = draw_rail_line_with_beats(*next_start, 500)
 
 map_generated += xml
 xml, _ = draw_finish_line(*next_start)
