@@ -48,7 +48,7 @@ class NoobSaber(gym.Env):
         self.reward_density = .1
         self.penalty_density = .02
         self.obs_size = 5
-        self.max_episode_steps = 100
+        self.max_episode_steps = 30 #100
         self.log_frequency = 10
         self.action_list = list(NoobSaberAction)
 
@@ -124,6 +124,7 @@ class NoobSaber(gym.Env):
             done: <bool> indicates terminal state
             info: <dict> dictionary of extra information
         """
+        pyautogui.press('enter')
         # Get Action
         action = self.action_list[action_idx]
         print("action: ", action_idx)
@@ -132,19 +133,19 @@ class NoobSaber(gym.Env):
         self.episode_step += 1
         print("====New Step====", self.episode_step)
 
-        # Get Done
-        done = False
-        if self.episode_step >= self.max_episode_steps or not self.agent_host.getWorldState().is_mission_running:
-            done = True
-            pyautogui.press('enter')
-            time.sleep(2)
-            print("====Done====", self.returns, self.episode_return)
-
-        pyautogui.press('enter')
-        # Get Observation
         world_state = self.agent_host.getWorldState()
         for error in world_state.errors:
             print("Error:", error.text)
+        pyautogui.press('enter')
+
+        # Get Done
+        done = False
+        if self.episode_step >= self.max_episode_steps or not world_state.is_mission_running:
+            done = True
+            time.sleep(2)
+            print("====Done====", self.returns, self.episode_return)
+        
+        # Get Observation
         cur_frames = self.get_color_map_frames(world_state)
         if len(cur_frames) <= 0:
             cur_frame = self._empty_obs()
@@ -161,7 +162,6 @@ class NoobSaber(gym.Env):
         self.episode_return += reward
         print("Reward:", reward)
         # return self.obs.flatten(), reward, done, dict()
-        pyautogui.press('enter')
         return cur_frame, reward, done, dict()
 
     def get_mission_xml(self):
@@ -213,14 +213,15 @@ class NoobSaber(gym.Env):
                         <Block type="water" reward="1000" />
                         <Block type="lava" reward="-1000" />
                     </RewardForTouchingBlockType>
-                    <RewardForTimeTaken initialReward="0" delta="0.1" density="PER_TICK" />
+                    
                     <RewardForCollectingItem>
+                        <Item type="diamond" reward="2" />
                         <Item type="redstone_block" reward="1" />
-                        <Item reward="50" type="wool" colour="LIGHT_BLUE" />
-                        <Item reward="60" type="wool" colour="YELLOW" />
+                        <Item reward="3" type="wool" colour="LIGHT_BLUE" />
+                        <Item reward="4" type="wool" colour="YELLOW" />
                     </RewardForCollectingItem>
                     <RewardForMissionEnd rewardForDeath="-100">
-                        <Reward reward="10" description="Mission End"/>
+                        <Reward reward="10000" description="Mission End"/>
                     </RewardForMissionEnd>
                     <ColourMapProducer>
                         <Width>{self.video_width}</Width>
@@ -293,7 +294,7 @@ class NoobSaber(gym.Env):
         time.sleep(0.1)
         pyautogui.move(-200, 0)
 
-        # pyautogui.press('enter')
+        pyautogui.press('enter')
 
         return world_state
 
@@ -425,7 +426,7 @@ if __name__ == '__main__':
     trainer = ppo.PPOTrainer(env=NoobSaber, config={
         'env_config': {},           # No environment parameters to configure
         'framework': 'torch',         # Use tensorflow
-        'num_gpus': 0.5,              # ? If possible, use GPUs
+        'num_gpus': 0,              # ? If possible, use GPUs
         'num_workers': 0,           # We aren't using parallelism
         # "train_batch_size": 100,
         # "sgd_minibatch_size": 64,
