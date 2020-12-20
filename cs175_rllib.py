@@ -309,7 +309,6 @@ class NoobSaber(gym.Env):
         pyautogui.move(-200, 0)
 
         #pyautogui.press('enter')
-
         return world_state
 
     def get_color_map_frames(self, world_state):
@@ -354,17 +353,17 @@ class NoobSaber(gym.Env):
                 f.write("{}\t{}\n".format(step, value))
 
     def _make_action(self, action: NoobSaberAction):
-        #delay = 0.07
+        delay = 0.05
         if action == NoobSaberAction.NOP:
             self.agent_host.sendCommand('chat .')
         elif action == NoobSaberAction.ATTACK_LEFT:
-            pyautogui.move(-200, 0)
-            self.agent_host.sendCommand('attack 1')#; time.sleep(delay)
-            pyautogui.move(200, 0)
+            pyautogui.move(-225, 0)
+            self.agent_host.sendCommand('attack 1'); time.sleep(delay)
+            pyautogui.move(225, 0)
         elif action == NoobSaberAction.ATTACK_RIGHT:
-            pyautogui.move(200, 0)
-            self.agent_host.sendCommand('attack 1')#; time.sleep(delay)
-            pyautogui.move(-200, 0)
+            pyautogui.move(225, 0)
+            self.agent_host.sendCommand('attack 1'); time.sleep(delay)
+            pyautogui.move(-225, 0)
         # elif action == NoobSaberAction.SWITCH:
         #     pyautogui.press('enter')
         #     if self.pickaxe == 0:
