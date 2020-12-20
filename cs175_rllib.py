@@ -32,16 +32,25 @@ ModelCatalog.register_custom_model('my_model', NoobSaberTorchModel)
 class NoobSaberAction(enum.Enum):
     NOP = 0
     ATTACK_LEFT = 1
-    ATTACK_RIGHT = 2
-    SWITCH = 3
+    ATTACK_LEFT_B = 2
+    ATTACK_LEFT_Y = 3
+    ATTACK_RIGHT = 4
+    ATTACK_RIGHT_B = 5
+    ATTACK_RIGHT_Y = 6
 
     def short_name(self):
         if self == NoobSaberAction.NOP:
             return 'NOP'
         elif self == NoobSaberAction.ATTACK_LEFT:
             return 'ATK_L'
-        elif self == NoobSaberAction.SWITCH:
-           return 'SWITCH'
+        elif self == NoobSaberAction.ATTACK_LEFT_B:
+            return 'ATK_L_BLUE'
+        elif self == NoobSaberAction.ATTACK_LEFT_Y:
+            return 'ATK_L_YELLOW'
+        elif self == NoobSaberAction.ATTACK_RIGHT_B:
+            return 'ATK_R_BLUE'
+        elif self == NoobSaberAction.ATTACK_RIGHT_Y:
+            return 'ATK_R_YELLOW'
         else:
             return 'ATK_R'  # ATTACK_RIGHT
 
@@ -129,9 +138,10 @@ class NoobSaber(gym.Env):
         # Get Action
         # if action_idx == 2: # change "do nothing" to "switch pickaxe"
         #    action_idx = 3
+        # action_idx = 2 if action_idx < 4 else 6
         action = self.action_list[action_idx]
-        #print("action: ", action.short_name())
         self._make_action(action)
+        # print("action: ", action.short_name(), self.pickaxe)
         self.episode_step += 1
         # print("====New Step====", self.episode_step)
 
@@ -358,31 +368,55 @@ class NoobSaber(gym.Env):
         if action == NoobSaberAction.NOP:
             self.agent_host.sendCommand('chat .')
         elif action == NoobSaberAction.ATTACK_LEFT:
-            pyautogui.move(-225, 0)
-            self.agent_host.sendCommand('attack 1')
-            time.sleep(delay)
-            pyautogui.move(225, 0)
+            self._atk_left(delay)
+        elif action == NoobSaberAction.ATTACK_LEFT_B:
+            self._switch(delay, 0)
+            self._atk_left(delay)
+        elif action == NoobSaberAction.ATTACK_LEFT_Y:
+            self._switch(delay, 1)
+            self._atk_left(delay)
         elif action == NoobSaberAction.ATTACK_RIGHT:
-            pyautogui.move(225, 0)
-            self.agent_host.sendCommand('attack 1')
+            self._atk_right(delay)
+        elif action == NoobSaberAction.ATTACK_RIGHT_B:
+            self._switch(delay, 0)
+            self._atk_right(delay)
+        elif action == NoobSaberAction.ATTACK_RIGHT_Y:
+            self._switch(delay, 1)
+            self._atk_right(delay)
+        
+    def _atk_left(self, delay):
+        pyautogui.move(-225, 0)
+        self.agent_host.sendCommand('attack 1')
+        time.sleep(delay)
+        pyautogui.move(225, 0)
+    
+    def _atk_right(self, delay):
+        pyautogui.move(225, 0)
+        self.agent_host.sendCommand('attack 1')
+        time.sleep(delay)
+        pyautogui.move(-225, 0)
+    
+    def _switch(self, delay, color):
+        pyautogui.press('enter') # has to be outside. bug if put inside switch function
+        if color == 0:
+            self._switch_blue(delay)
+        else:
+            self._switch_yellow(delay)
+        time.sleep(0.02)
+        pyautogui.press('enter')
+        time.sleep(0.02)
+    
+    def _switch_blue(self, delay):
+        if self.pickaxe != 0:
+            self.agent_host.sendCommand('hotbar.1 1')
             time.sleep(delay)
-            pyautogui.move(-225, 0)
-        elif action == NoobSaberAction.SWITCH:
-            pyautogui.press('enter')
-            if self.pickaxe == 0:
-                self.agent_host.sendCommand('hotbar.2 1')
-                time.sleep(delay)
-                self.pickaxe += 1
-            else:
-                self.agent_host.sendCommand('hotbar.1 1')
-                time.sleep(delay)
-                self.pickaxe = 0
-            pyautogui.press('enter')
-            time.sleep(0.02)
-            pyautogui.move(225, 0) #
-            self.agent_host.sendCommand('attack 1')
+            self.pickaxe = 0
+
+    def _switch_yellow(self, delay):
+        if self.pickaxe == 0:
+            self.agent_host.sendCommand('hotbar.2 1')
             time.sleep(delay)
-            pyautogui.move(-225, 0)
+            self.pickaxe += 1
 
     def _resize_frame_pixels(self, frame):
         img = Image.frombytes(
