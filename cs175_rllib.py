@@ -32,18 +32,16 @@ ModelCatalog.register_custom_model('my_model', NoobSaberTorchModel)
 class NoobSaberAction(enum.Enum):
     NOP = 0
     ATTACK_LEFT = 1
-    ATTACK_RIGHT = 2
-    SWITCH = 3
+    ATTACK_LEFT_DOWN = 2
+    ATTACK_LEFT_UP = 3
+    ATTACK_UP = 4
+    ATTACK_RIGHT = 5
+    ATTACK_RIGHT_DOWN = 6
+    ATTACK_RIGHT_UP = 7
+    SWITCH = 8
 
     def short_name(self):
-        if self == NoobSaberAction.NOP:
-            return 'NOP'
-        elif self == NoobSaberAction.ATTACK_LEFT:
-            return 'ATK_L'
-        elif self == NoobSaberAction.SWITCH:
-           return 'SWITCH'
-        else:
-            return 'ATK_R'  # ATTACK_RIGHT
+        return ['NOP', '←', '↙', '↖', '↑', '→', '↘', '↗', 'SWITCH'][self.value]
 
 
 class NoobSaber(gym.Env):
@@ -130,7 +128,7 @@ class NoobSaber(gym.Env):
         # if action_idx == 0: # change "do nothing" to "switch pickaxe"
         #     action_idx = 3
         action = self.action_list[action_idx]
-        print("action: ", action.short_name())
+        # print("action: ", action.short_name())
         self._make_action(action)
         self.episode_step += 1
         # print("====New Step====", self.episode_step)
@@ -378,6 +376,31 @@ class NoobSaber(gym.Env):
                 time.sleep(delay)
                 self.pickaxe = 0
             pyautogui.press('enter')
+        elif action == NoobSaberAction.ATTACK_LEFT_DOWN:
+            pyautogui.move(-225, 225)
+            self.agent_host.sendCommand('attack 1')
+            time.sleep(delay)
+            pyautogui.move(225, -225)
+        elif action == NoobSaberAction.ATTACK_LEFT_UP:
+            pyautogui.move(-225, -225)
+            self.agent_host.sendCommand('attack 1')
+            time.sleep(delay)
+            pyautogui.move(225, 225)
+        elif action == NoobSaberAction.ATTACK_UP:
+            pyautogui.move(0, -225)
+            self.agent_host.sendCommand('attack 1')
+            time.sleep(delay)
+            pyautogui.move(0, 225)
+        elif action == NoobSaberAction.ATTACK_RIGHT_DOWN:
+            pyautogui.move(225, 225)
+            self.agent_host.sendCommand('attack 1')
+            time.sleep(delay)
+            pyautogui.move(-225, -225)
+        elif action == NoobSaberAction.ATTACK_RIGHT_UP:
+            pyautogui.move(225, -225)
+            self.agent_host.sendCommand('attack 1')
+            time.sleep(delay)
+            pyautogui.move(-225, 225)
 
     def _resize_frame_pixels(self, frame):
         img = Image.frombytes(

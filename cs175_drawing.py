@@ -44,8 +44,8 @@ def _generate_beats(x1: int, x2: int, y: int, z: int, prob: float):
     for x in range(x1, x2, + 1):
         if draw_counter > 0:
             ret += _draw_block(x, y + 1, drawing_z, 'wool', colour=drawing_color)
-            
             draw_counter -= 1
+
         elif padding_counter > 0:
             padding_counter -= 1
         
@@ -55,12 +55,34 @@ def _generate_beats(x1: int, x2: int, y: int, z: int, prob: float):
             drawing_z = z - 1 if random.random() >= 0.5 else z + 1
             drawing_color = 'LIGHT_BLUE' if random.random() >= 0.6 else 'YELLOW'
             ret += _draw_block(x, y + 1, drawing_z, 'wool', colour=drawing_color)
-
-        # if random.random() > prob:
-        #     ret += _draw_block(x, y + 1, z - 1, 'wool', colour="LIGHT_BLUE")
-        # if random.random() > prob:
-        #     ret += _draw_block(x, y + 1, z + 1, 'wool', colour='YELLOW')
     
+    return ret
+
+
+def _generate_beats_v2(x1: int, x2: int, y: int, z: int, prob: float):
+    ret = ''
+    draw_counter = 0
+    padding_counter = 0
+    drawing_z = z
+    drawing_y = y
+    drawing_color = ''
+
+    for x in range(x1, x2, + 1):
+        if draw_counter > 0:
+            ret += _draw_block(x, drawing_y, drawing_z, 'wool', colour=drawing_color)
+            draw_counter -= 1
+
+        elif padding_counter > 0:
+            padding_counter -= 1
+        
+        elif random.random() > prob:
+            draw_counter = 3
+            padding_counter = 4
+            drawing_y = random.choice([y, y + 1, y + 2])
+            drawing_z = random.choice([z - 1, z, z + 1]) if drawing_y == y + 2 else random.choice([z - 1, z + 1])
+            drawing_color = 'LIGHT_BLUE' if random.random() >= 0.6 else 'YELLOW'
+            ret += _draw_block(x, drawing_y, drawing_z, 'wool', colour=drawing_color)
+
     return ret
 
 
@@ -144,7 +166,7 @@ def draw_branch_left(entry_x: int, entry_y: int, entry_z: int) -> Tuple[str, Tup
     ''', (entry_x + 20, entry_y, entry_z)
 
 
-def draw_rail_line_with_beats(entry_x: int, entry_y: int, entry_z: int, length: int) -> Tuple[str, Tuple[int, int, int]]:
+def draw_rail_line_with_beats(entry_x: int, entry_y: int, entry_z: int, length: int, use_v2: bool = True) -> Tuple[str, Tuple[int, int, int]]:
     return f'''<!--Clear-->
     {_draw_line(entry_x, entry_x + length, entry_y, entry_y, entry_z, entry_z, "air")}
     {_draw_line(entry_x, entry_x + length, entry_y - 1, entry_y - 1, entry_z, entry_z, "air")}
@@ -155,9 +177,7 @@ def draw_rail_line_with_beats(entry_x: int, entry_y: int, entry_z: int, length: 
     {_draw_red_stone_and_golden_rail_as_line(entry_x, entry_x + length, entry_y, entry_y, entry_z, entry_z)}
     {_draw_line(entry_x, entry_x + length, entry_y + 1, entry_y + 1, entry_z - 1, entry_z - 1, "air")}
     {_draw_line(entry_x, entry_x + length, entry_y + 1, entry_y + 1, entry_z + 1, entry_z + 1, "air")}
-    <!-- {_draw_line(entry_x, entry_x + length, entry_y + 1, entry_y + 1, entry_z - 1, entry_z - 1, "wool", colour="YELLOW")} -->
-    <!-- {_draw_line(entry_x, entry_x + length, entry_y + 1, entry_y + 1, entry_z + 1, entry_z + 1, "wool", colour="LIGHT_BLUE")} -->
-    {_generate_beats(entry_x, entry_x + length, entry_y, entry_z, 0.5)}
+    {_generate_beats_v2(entry_x, entry_x + length, entry_y, entry_z, 0.5) if use_v2 else _generate_beats(entry_x, entry_x + length, entry_y, entry_z, 0.5)}
     ''', (entry_x + length + 1, entry_y, entry_z)
 
 
@@ -200,14 +220,14 @@ def draw_starting_point(entry_x: int, entry_y: int, entry_z: int) -> Tuple[str, 
 
 def draw_finish_line(entry_x: int, entry_y: int, entry_z: int) -> Tuple[str, Tuple[int, int, int]]:
     return f'''
-    {_draw_cuboid(entry_x + 10, entry_x, entry_y - 1, entry_y - 10, entry_z - 6, entry_z + 6, "stained_glass", colour="PINK")}
-    {_draw_cuboid(entry_x + 9, entry_x + 1, entry_y - 1, entry_y - 8, entry_z -5, entry_z + 5, "water")}
+    {_draw_cuboid(entry_x + 10, entry_x, entry_y - 1, entry_y - 2, entry_z - 6, entry_z + 6, "stained_glass", colour="PINK")}
+    {_draw_cuboid(entry_x + 9, entry_x + 1, entry_y - 1, entry_y - 1, entry_z - 5, entry_z + 5, "water")}
     {_draw_block(entry_x, entry_y - 1, entry_z, "iron_block")}
     {_draw_block(entry_x, entry_y, entry_z, "golden_rail")}
     ''', (entry_x + 11, entry_y, entry_z)
 
 
-map_generated = _draw_cuboid(-256, 256, -256, 256, -256, 256, "air")
+map_generated = _draw_cuboid(-256, 512, -256, 256, -256, 256, "air")
 xml, next_start = draw_starting_point(0, 10, 0)
 
 # map_generated += xml
