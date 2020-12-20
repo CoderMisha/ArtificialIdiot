@@ -51,7 +51,7 @@ def _generate_beats(x1: int, x2: int, y: int, z: int, prob: float):
         
         elif random.random() > prob:
             draw_counter = 3
-            padding_counter = 2
+            padding_counter = 4
             drawing_z = z - 1 if random.random() >= 0.5 else z + 1
             drawing_color = 'LIGHT_BLUE' if random.random() >= 0.6 else 'YELLOW'
             ret += _draw_block(x, y + 1, drawing_z, 'wool', colour=drawing_color)

@@ -33,17 +33,17 @@ class NoobSaberAction(enum.Enum):
     NOP = 0
     ATTACK_LEFT = 1
     ATTACK_RIGHT = 2
-    #SWITCH = 3
+    SWITCH = 3
 
     def short_name(self):
         if self == NoobSaberAction.NOP:
             return 'NOP'
         elif self == NoobSaberAction.ATTACK_LEFT:
             return 'ATK_L'
-        #elif self == NoobSaberAction.SWITCH:
-        #    return 'SWITCH'
-        
-        return 'ATK_R'  # ATTACK_RIGHT
+        elif self == NoobSaberAction.SWITCH:
+           return 'SWITCH'
+        else:
+            return 'ATK_R'  # ATTACK_RIGHT
 
 
 class NoobSaber(gym.Env):
@@ -130,7 +130,7 @@ class NoobSaber(gym.Env):
         # if action_idx == 0: # change "do nothing" to "switch pickaxe"
         #     action_idx = 3
         action = self.action_list[action_idx]
-        # print("action: ", action.short_name())
+        print("action: ", action.short_name())
         self._make_action(action)
         self.episode_step += 1
         # print("====New Step====", self.episode_step)
@@ -228,8 +228,8 @@ class NoobSaber(gym.Env):
                     <!-- <RewardForTimeTaken initialReward="0" delta="0.1" density="PER_TICK" /> --> 
                     <RewardForCollectingItem>
                         <Item type="redstone_block" reward="1" />
-                        <Item reward="50" type="wool" colour="LIGHT_BLUE" />
-                        <Item reward="-60" type="wool" colour="YELLOW" />
+                        <Item reward="55" type="wool" colour="LIGHT_BLUE" />
+                        <Item reward="66" type="wool" colour="YELLOW" />
                     </RewardForCollectingItem>
                     <RewardForMissionEnd rewardForDeath="-100">
                         <Reward reward="1" description="Mission End"/>
@@ -284,6 +284,9 @@ class NoobSaber(gym.Env):
             world_state = self.agent_host.getWorldState()
             for error in world_state.errors:
                 print("\nError:", error.text)
+
+        self.agent_host.sendCommand('hotbar.1 1')
+        self.pickaxe = 0
 
         pyautogui.press('enter')
         pyautogui.rightClick()
@@ -364,15 +367,17 @@ class NoobSaber(gym.Env):
             self.agent_host.sendCommand('attack 1')
             time.sleep(delay)
             pyautogui.move(-225, 0)
-        # elif action == NoobSaberAction.SWITCH:
-        #     pyautogui.press('enter')
-        #     if self.pickaxe == 0:
-        #         self.agent_host.sendCommand('hotbar.2 1'); time.sleep(delay)
-        #         self.pickaxe += 1
-        #     else:
-        #         self.agent_host.sendCommand('hotbar.1 1'); time.sleep(delay)
-        #         self.pickaxe = 0
-        #     pyautogui.press('enter')
+        elif action == NoobSaberAction.SWITCH:
+            pyautogui.press('enter')
+            if self.pickaxe == 0:
+                self.agent_host.sendCommand('hotbar.2 1')
+                time.sleep(delay)
+                self.pickaxe += 1
+            else:
+                self.agent_host.sendCommand('hotbar.1 1')
+                time.sleep(delay)
+                self.pickaxe = 0
+            pyautogui.press('enter')
 
     def _resize_frame_pixels(self, frame):
         img = Image.frombytes(

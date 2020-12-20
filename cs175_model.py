@@ -12,10 +12,10 @@ class NoobSaberTorchModel(TorchModelV2, nn.Module):
         TorchModelV2.__init__(self, obs_space, action_space, num_outputs, model_config, name)
         nn.Module.__init__(self)
 
-        self.conv1 = nn.Conv2d(3, 6, 3)
-        self.conv2 = nn.Conv2d(6, 16, 3)
-        self.conv3 = nn.Conv2d(16, 32, 3)
-        self.fc1 = nn.Linear(32 * 37 * 47, 120)
+        self.conv1 = nn.Conv2d(3, 8, 3)
+        self.conv2 = nn.Conv2d(8, 32, 3)
+        self.conv3 = nn.Conv2d(32, 64, 3)
+        self.fc1 = nn.Linear(64 * 37 * 47, 120)
         self.fc2 = nn.Linear(120, 84)
         self.fc3 = nn.Linear(84, num_outputs)
 
