@@ -100,8 +100,6 @@ class NoobSaber(gym.Env):
         self.episode_return = 0
         self.episode_step = 0
 
-        # TODO: Reset mouse movement
-
         # Log
         if len(self.returns) > self.log_frequency and len(self.returns) % self.log_frequency == 0:
             self.log_returns()
@@ -129,28 +127,26 @@ class NoobSaber(gym.Env):
             done: <bool> indicates terminal state
             info: <dict> dictionary of extra information
         """
-        pyautogui.press('enter')
-        # Get Action
-        if action_idx == 0: # change "do nothing" to "switch pickaxe"
-            action_idx = 3
-        action = self.action_list[action_idx]
-        print("action: ", action_idx)
-        self._make_action(action)
-        #time.sleep(.05)
-        self.episode_step += 1
-        print("====New Step====", self.episode_step)
-
         world_state = self.agent_host.getWorldState()
-        for error in world_state.errors:
-            print("Error:", error.text)
-        pyautogui.press('enter')
 
         # Get Done
         done = False
         if self.episode_step >= self.max_episode_steps or not world_state.is_mission_running:
             done = True
-            time.sleep(2)
-            print("====Done====", self.returns, self.episode_return)
+            # time.sleep(2)
+
+        if(not done):
+            # Get Action
+            pyautogui.press('enter')
+            # if action_idx == 0: # change "do nothing" to "switch pickaxe"
+            #     action_idx = 3
+            action = self.action_list[action_idx]
+            print("action: ", action_idx)
+            self._make_action(action)
+            time.sleep(.05)
+            self.episode_step += 1
+            # print("====New Step====", self.episode_step)
+            pyautogui.press('enter')
         
         # Get Observation
         cur_frames = self.get_color_map_frames(world_state)
@@ -162,12 +158,18 @@ class NoobSaber(gym.Env):
 
         # Get Reward
         reward = 0
-        print("world state,", world_state)
+        # print("world state,", world_state)
         for r in world_state.rewards:
-            print(r, "+++",r.getValue())
+            # print(r, "+++", r.getValue())
             reward += self.apply_reward(r.getValue())
         self.episode_return += reward
         print("Reward:", reward)
+        
+        for error in world_state.errors:
+            print("Error:", error.text)
+        if done:
+            print("====Done====", self.episode_return)
+
         # return self.obs.flatten(), reward, done, dict()
         return cur_frame, reward, done, dict()
     
@@ -227,17 +229,17 @@ class NoobSaber(gym.Env):
                     </ObservationFromGrid>
                     <InventoryCommands/>
                     <RewardForTouchingBlockType>
-                        <Block type="water" reward="100" />
+                        <Block type="water" reward="10000" />
                         <Block type="lava" reward="-100" />
                     </RewardForTouchingBlockType>
-                    <!-- <RewardForTimeTaken initialReward="0" delta="0.1" density="PER_TICK" /> --> 
+                    <RewardForTimeTaken initialReward="0" delta="0.1" density="PER_TICK" />
                     <RewardForCollectingItem>
                         <Item type="redstone_block" reward="1" />
                         <Item reward="55" type="wool" colour="LIGHT_BLUE" />
                         <Item reward="66" type="wool" colour="YELLOW" />
                     </RewardForCollectingItem>
                     <RewardForMissionEnd rewardForDeath="-100">
-                        <Reward reward="10000" description="Mission End"/>
+                        <Reward reward="0" description="Mission End"/>
                     </RewardForMissionEnd>
                     <ColourMapProducer>
                         <Width>{self.video_width}</Width>
@@ -246,7 +248,7 @@ class NoobSaber(gym.Env):
                     <AgentQuitFromReachingCommandQuota total="{self.max_episode_steps}" />
                     <AgentQuitFromTouchingBlockType>
                         <Block type="water" description="success" />
-                        <Block type="lava" description="dead end" />
+                        <!--<Block type="lava" description="dead end" />-->
                     </AgentQuitFromTouchingBlockType>
                 </AgentHandlers>
             </AgentSection>
@@ -324,7 +326,8 @@ class NoobSaber(gym.Env):
             if len(world_state.errors) > 0:
                 for idx, e in enumerate(world_state.errors):
                     print(f'error #{idx}: {e.text}', file=sys.stderr)
-                raise RuntimeError('Could not load color map frame(s).')
+                # raise RuntimeError('Could not load color map frame(s).')
+                return []
 
             if world_state.number_of_video_frames_since_last_state > 0:
                 for frame in world_state.video_frames:
@@ -341,7 +344,8 @@ class NoobSaber(gym.Env):
                         # img.close()
                         frames.append(frame)
                 break
-        print("cur_frame:", len(frames), end = " | ")
+
+        # print("cur_frame:", len(frames), end = " | ")
         return frames
 
     def get_observation(self, world_state):
@@ -403,12 +407,12 @@ class NoobSaber(gym.Env):
         plt.xlabel('Steps')
         plt.savefig('returns.png')
 
-        with open('returns.txt', 'w') as f:
-            for step, value in zip(self.steps, self.returns):
-                f.write("{}\t{}\n".format(step, value))
+        # with open('returns.txt', 'w') as f:
+        #     for step, value in zip(self.steps, self.returns):
+        #         f.write("{}\t{}\n".format(step, value))
 
     def _make_action(self, action: NoobSaberAction):
-        delay = 0.07
+        delay = 0.01 # 0.07
         if action == NoobSaberAction.NOP:
             pass
         elif action == NoobSaberAction.ATTACK_LEFT:
@@ -424,16 +428,16 @@ class NoobSaber(gym.Env):
             pyautogui.move(-200, 0)
             # pyautogui.press('enter')
         elif action == NoobSaberAction.SWITCH:
-            pyautogui.press('enter')
+            # pyautogui.press('enter')
             if self.pickaxe == 0:
                 #print("==========================================Swicth To Yellow")
                 self.agent_host.sendCommand('hotbar.2 1'); time.sleep(delay)
-                self.pickaxe += 1
+                self.pickaxe = 1
             else:
                 #print("==========================================Swicth To Blue")
                 self.agent_host.sendCommand('hotbar.1 1'); time.sleep(delay)
                 self.pickaxe = 0
-            pyautogui.press('enter')
+            # pyautogui.press('enter')
 
     def _resize_frame_pixels(self, frame, new_width_pixel, new_height_pixel):
         pixel_array = np.array(list(bytes(frame.pixels)))
@@ -442,11 +446,11 @@ class NoobSaber(gym.Env):
         edge_width_pixel = int((self.video_width - new_width_pixel) / 2)
         matrix_want = pixel_array[edge_height_pixel : (self.video_height - edge_height_pixel),
                                   edge_width_pixel * 3 : (self.video_width * 3 - edge_width_pixel * 3)]
-        print("Resized:", len(matrix_want.flatten().tolist()))
+        # print("Resized:", len(matrix_want.flatten().tolist()))
         return matrix_want.flatten().tolist()
 
     def _empty_obs(self):
-        print("Empty obs:", len(np.zeros(self.obs_height * self.obs_width * 3).tolist()))
+        # print("Empty obs:", len(np.zeros(self.obs_height * self.obs_width * 3).tolist()))
         return np.zeros(self.obs_height * self.obs_width * 3).tolist()
 
 if __name__ == '__main__':
