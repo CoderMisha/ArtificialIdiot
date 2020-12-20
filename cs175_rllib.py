@@ -130,10 +130,10 @@ class NoobSaber(gym.Env):
         # if action_idx == 0: # change "do nothing" to "switch pickaxe"
         #     action_idx = 3
         action = self.action_list[action_idx]
-        print("action: ", action_idx)
+        # print("action: ", action.short_name())
         self._make_action(action)
         self.episode_step += 1
-        print("====New Step====", self.episode_step)
+        # print("====New Step====", self.episode_step)
 
         world_state = self.agent_host.getWorldState()
         for error in world_state.errors:
@@ -157,12 +157,12 @@ class NoobSaber(gym.Env):
 
         # Get Reward
         reward = 0
-        print("world state,", world_state)
+        # print("world state,", world_state)
         for r in world_state.rewards:
-            print(r, "+++",r.getValue())
+            # print(r, "+++",r.getValue())
             reward += self.apply_reward(r.getValue())
         self.episode_return += reward
-        print("Reward:", reward)
+        # print("Reward:", reward)
         return cur_frame, reward, done, dict()
     
     def apply_reward(self, reward):
@@ -288,9 +288,6 @@ class NoobSaber(gym.Env):
         pyautogui.press('enter')
         pyautogui.rightClick()
         pyautogui.rightClick()
-        pyautogui.rightClick()
-        pyautogui.rightClick()
-        pyautogui.rightClick()
 
         # head's up
         pyautogui.move(0, -200)
@@ -329,7 +326,7 @@ class NoobSaber(gym.Env):
                     if frame.frametype == MalmoPython.FrameType.COLOUR_MAP:
                         frames.append(frame)
                 break
-        print("cur_frame:", len(frames), end = " | ")
+        #print("cur_frame:", len(frames), end = " | ")
         return frames
 
     def log_returns(self):
@@ -354,17 +351,19 @@ class NoobSaber(gym.Env):
                 f.write("{}\t{}\n".format(step, value))
 
     def _make_action(self, action: NoobSaberAction):
-        #delay = 0.07
+        delay = 0.05
         if action == NoobSaberAction.NOP:
             self.agent_host.sendCommand('chat .')
         elif action == NoobSaberAction.ATTACK_LEFT:
-            pyautogui.move(-200, 0)
-            self.agent_host.sendCommand('attack 1')#; time.sleep(delay)
-            pyautogui.move(200, 0)
+            pyautogui.move(-225, 0)
+            self.agent_host.sendCommand('attack 1')
+            time.sleep(delay)
+            pyautogui.move(225, 0)
         elif action == NoobSaberAction.ATTACK_RIGHT:
-            pyautogui.move(200, 0)
-            self.agent_host.sendCommand('attack 1')#; time.sleep(delay)
-            pyautogui.move(-200, 0)
+            pyautogui.move(225, 0)
+            self.agent_host.sendCommand('attack 1')
+            time.sleep(delay)
+            pyautogui.move(-225, 0)
         # elif action == NoobSaberAction.SWITCH:
         #     pyautogui.press('enter')
         #     if self.pickaxe == 0:
@@ -419,4 +418,5 @@ if __name__ == '__main__':
 
     while True:
         print("======Start======")
-        print("Train:", trainer.train())
+        #print("Train:", trainer.train())
+        trainer.train()

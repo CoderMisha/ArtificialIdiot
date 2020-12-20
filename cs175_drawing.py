@@ -37,6 +37,7 @@ def _draw_red_stone_and_golden_rail_as_line(x1: int, x2: int, y1: int, y2: int, 
 def _generate_beats(x1: int, x2: int, y: int, z: int, prob: float):
     ret = ''
     draw_counter = 0
+    padding_counter = 0
     drawing_z = z
     drawing_color = ''
 
@@ -45,11 +46,14 @@ def _generate_beats(x1: int, x2: int, y: int, z: int, prob: float):
             ret += _draw_block(x, y + 1, drawing_z, 'wool', colour=drawing_color)
             
             draw_counter -= 1
+        elif padding_counter > 0:
+            padding_counter -= 1
         
         elif random.random() > prob:
             draw_counter = 3
+            padding_counter = 2
             drawing_z = z - 1 if random.random() >= 0.5 else z + 1
-            drawing_color = 'LIGHT_BLUE' if random.random() >= 0.5 else 'YELLOW'
+            drawing_color = 'LIGHT_BLUE' if random.random() >= 0.6 else 'YELLOW'
             ret += _draw_block(x, y + 1, drawing_z, 'wool', colour=drawing_color)
 
         # if random.random() > prob:
