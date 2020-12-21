@@ -11,6 +11,7 @@ import time
 import enum
 import matplotlib.pyplot as plt
 import numpy as np
+import random
 
 import gym
 import ray
@@ -129,6 +130,7 @@ class NoobSaber(gym.Env):
         #    action_idx = 3
         # action_idx = 2 if action_idx < 4 else 6
         action = self.action_list[action_idx]
+        action = random.choice(self.action_list)
         self._make_action(action)
         # print("action: ", action.short_name(), self.pickaxe)
         self.episode_step += 1
@@ -245,6 +247,7 @@ class NoobSaber(gym.Env):
                 </AgentHandlers>
             </AgentSection>
         </Mission>'''
+
 
     def init_malmo(self):
         """
