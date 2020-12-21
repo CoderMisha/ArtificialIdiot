@@ -221,17 +221,17 @@ class NoobSaber(gym.Env):
                     </ObservationFromGrid>
                     <InventoryCommands/>
                     <RewardForTouchingBlockType>
-                        <Block type="water" reward="1" />
-                        <Block type="lava" reward="-1" />
+                        <Block type="water" reward="10000" />
+                        <Block type="lava" reward="-1000" />
                     </RewardForTouchingBlockType>
-                    <!-- <RewardForTimeTaken initialReward="0" delta="0.1" density="PER_TICK" /> --> 
+                    <RewardForTimeTaken initialReward="0" delta="0.1" density="PER_TICK" />
                     <RewardForCollectingItem>
-                        <Item type="redstone_block" reward="1" />
+                        <Item type="redstone_block" reward="100" />
                         <Item reward="55" type="wool" colour="LIGHT_BLUE" />
                         <Item reward="66" type="wool" colour="YELLOW" />
                     </RewardForCollectingItem>
-                    <RewardForMissionEnd rewardForDeath="-1">
-                        <Reward reward="1" description="Mission End"/>
+                    <RewardForMissionEnd rewardForDeath="-1000">
+                        <Reward reward="0" description="Mission End"/>
                     </RewardForMissionEnd>
                     <ColourMapProducer>
                         <Width>{self.video_width}</Width>
