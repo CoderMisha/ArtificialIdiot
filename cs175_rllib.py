@@ -32,18 +32,16 @@ ModelCatalog.register_custom_model('my_model', NoobSaberTorchModel)
 class NoobSaberAction(enum.Enum):
     NOP = 0
     ATTACK_LEFT = 1
-    ATTACK_RIGHT = 2
-    SWITCH = 3
+    ATTACK_LEFT_DOWN = 2
+    ATTACK_LEFT_UP = 3
+    ATTACK_UP = 4
+    ATTACK_RIGHT = 5
+    ATTACK_RIGHT_DOWN = 6
+    ATTACK_RIGHT_UP = 7
+    SWITCH = 8
 
     def short_name(self):
-        if self == NoobSaberAction.NOP:
-            return 'NOP'
-        elif self == NoobSaberAction.ATTACK_LEFT:
-            return 'ATK_L'
-        elif self == NoobSaberAction.SWITCH:
-           return 'SWITCH'
-        else:
-            return 'ATK_R'  # ATTACK_RIGHT
+        return ['NOP', '←', '↙', '↖', '↑', '→', '↘', '↗', 'SWITCH'][self.value]
 
 
 class NoobSaber(gym.Env):
@@ -54,7 +52,7 @@ class NoobSaber(gym.Env):
         self.penalty_density = .02
         self.obs_size = 5
         self.max_episode_steps = 500
-        self.log_frequency = 10
+        self.log_frequency = 5
         self.action_list = list(NoobSaberAction)
 
         self.obs_height = 314
@@ -127,11 +125,12 @@ class NoobSaber(gym.Env):
         """
         #pyautogui.press('enter')
         # Get Action
-        # if action_idx == 0: # change "do nothing" to "switch pickaxe"
-        #     action_idx = 3
+        # if action_idx == 2: # change "do nothing" to "switch pickaxe"
+        #    action_idx = 3
+        # action_idx = 2 if action_idx < 4 else 6
         action = self.action_list[action_idx]
-        print("action: ", action.short_name())
         self._make_action(action)
+        # print("action: ", action.short_name(), self.pickaxe)
         self.episode_step += 1
         # print("====New Step====", self.episode_step)
 
@@ -146,7 +145,7 @@ class NoobSaber(gym.Env):
             pyautogui.press('enter')
             done = True
             time.sleep(2)
-            print("====Done====", self.returns, self.episode_return)
+            print("====Done==== Step:", self.episode_step, "|", self.returns, self.episode_return)
         
         # Get Observation
         cur_frames = self.get_color_map_frames(world_state)
@@ -223,7 +222,7 @@ class NoobSaber(gym.Env):
                     <InventoryCommands/>
                     <RewardForTouchingBlockType>
                         <Block type="water" reward="1" />
-                        <Block type="lava" reward="-100" />
+                        <Block type="lava" reward="-1" />
                     </RewardForTouchingBlockType>
                     <!-- <RewardForTimeTaken initialReward="0" delta="0.1" density="PER_TICK" /> --> 
                     <RewardForCollectingItem>
@@ -231,7 +230,7 @@ class NoobSaber(gym.Env):
                         <Item reward="55" type="wool" colour="LIGHT_BLUE" />
                         <Item reward="66" type="wool" colour="YELLOW" />
                     </RewardForCollectingItem>
-                    <RewardForMissionEnd rewardForDeath="-100">
+                    <RewardForMissionEnd rewardForDeath="-1">
                         <Reward reward="1" description="Mission End"/>
                     </RewardForMissionEnd>
                     <ColourMapProducer>
@@ -378,6 +377,32 @@ class NoobSaber(gym.Env):
                 time.sleep(delay)
                 self.pickaxe = 0
             pyautogui.press('enter')
+        elif action == NoobSaberAction.ATTACK_LEFT_DOWN:
+            pyautogui.move(-225, 225)
+            self.agent_host.sendCommand('attack 1')
+            time.sleep(delay)
+            pyautogui.move(225, -225)
+        elif action == NoobSaberAction.ATTACK_LEFT_UP:
+            pyautogui.move(-225, -225)
+            self.agent_host.sendCommand('attack 1')
+            time.sleep(delay)
+            pyautogui.move(225, 225)
+        elif action == NoobSaberAction.ATTACK_UP:
+            pyautogui.move(0, -225)
+            self.agent_host.sendCommand('attack 1')
+            time.sleep(delay)
+            pyautogui.move(0, 225)
+        elif action == NoobSaberAction.ATTACK_RIGHT_DOWN:
+            pyautogui.move(225, 225)
+            self.agent_host.sendCommand('attack 1')
+            time.sleep(delay)
+            pyautogui.move(-225, -225)
+        elif action == NoobSaberAction.ATTACK_RIGHT_UP:
+            pyautogui.move(225, -225)
+            self.agent_host.sendCommand('attack 1')
+            time.sleep(delay)
+            pyautogui.move(-225, 225)
+        
 
     def _resize_frame_pixels(self, frame):
         img = Image.frombytes(
