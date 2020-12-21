@@ -16,11 +16,17 @@ The task of the AI is trying to hit the block along the railroad while riding on
 
 To make this task more challenging, the AI will encounter multiple rail ways and have to choose the correct one (other wrong ones will lead to lava). The AI should hit the controling redstone at proper time to switch railways to ride on correct one. The AI will get rewards when it lives, and be punished when it falls into lava.
 
-This problem / setting needs AI/ML algorithm to solve it because it is quite hard for humans to manually play this game perfectly in Minecraft, while the cart drives relatively fast and features and blocks appear frequently. For an AI to play such gemes, it will need convolutional neural networks and reinforcement learning to learn when blocks are approaching and where and when it needs to hit the blocks to earn scores and keep living.
+This problem/setting needs AI/ML algorithm to solve it because it is quite hard for humans to manually play this game perfectly in Minecraft, while the cart drives relatively fast and features and blocks appear frequently. A simple if-else algorithm could be implemented, however, considering how fast the agent is moving and how fast the blocks are approaching, the agent would require a huge 3-D observation space in order to capture the upcoming items, which is very inefficient and memory-consuming. Thus, in this problem, an AI/ML algorithm which learns features from a smaller 2-D game frame is more favorable. For an AI to play such games, it will need convolutional neural networks and reinforcement learning to learn when blocks are approaching and where and when it needs to hit the blocks to earn scores and keep living.
 
 ## Approach
 
 ### Rewards
+
+To reward our agent during training, we are considering 4 factors: completion of the task, the time ticks the agent survived, the number of correct hits and number of the number of wrong hits. In terms of completion, the agent will gain a huge reward if it finish the task or punished if it dies (fail to switch railways). The reward function could be written in this linear combination:
+
+![equation](https://latex.codecogs.com/gif.latex?%5Cdpi%7B200%7D%20%5Ctiny%20R%28s%29%20%3D%2010000*ifReachesEnd%20&plus;%2010*nCorrectHit%20&plus;%200.1*timeTicks%20-%20nWrongHit%20-%20100*ifDies)
+
+Descriptions:
 - Safely complete the mission without falling into the lava (which means the AI correctly hits all the lever redstones): 10000
 - Fall into the lava: -100
 - Reward for living (per tick): 0.1
@@ -38,6 +44,7 @@ This problem / setting needs AI/ML algorithm to solve it because it is quite har
 ### Observation / Information for the AI
 
 - the center (396x314) of the current frame (960x540)
+- It is worth mentioning that our agent rides on the railroad at high-speed and it needs to perform two tasks when seeing a block: (1) decide whether it needs to switch weapon; (2) turn the camera and hit. By testing, we decided that this resolution is good enough for the agent to foresee the coming blocks and make reactions.
 
 ### Model
 
