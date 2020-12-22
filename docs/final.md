@@ -81,6 +81,7 @@ Deep Q Network
 - nn.Conv2d(3, 6, 3) -> relu -> max_pool -> nn.Conv2d(6, 16, 3) -> relu -> max_pool -> nn.Conv2d(16, 32, 3) -> relu -> max_pool
 - Input: the resized frame (shape=(314, 396, 3))
 - Activation: relu, max_pool
+
 3-layer Fully Connected Neural Network
 - Output: action index
         
