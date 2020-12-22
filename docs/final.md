@@ -96,8 +96,8 @@ Deep Q Network
 
 - Output: action index
 
-![NN Structure](./_images/nn_structure1.png)
-![NN Structure](./_images/nn_structure2.png)
+![NN Structure](https://raw.githubusercontent.com/WendyWjt/ArtificialIdiot/main/docs/_images/nn_structure1.png)
+![NN Structure](https://raw.githubusercontent.com/WendyWjt/ArtificialIdiot/main/docs/_images/nn_structure2.png)
 
 ### Comparisons with the past approaches
 
@@ -167,17 +167,17 @@ The total score the agent receives after completing each episode is one evaluati
 
 ##### Rewards for Our AI
 
-![algorithm visaulize](./_images/7-direction-weapon-switch-no-redstone.png)
+![algorithm visaulize](https://raw.githubusercontent.com/WendyWjt/ArtificialIdiot/main/docs/_images/7-direction-weapon-switch-no-redstone.png)
 
 #### 2-Direction + Redstone
 
 ##### Rewards for Random Agent (Baseline)
 
-![algorithm visaulize](./_images/2-direction-switch-branch-random.png)
+![algorithm visaulize](https://raw.githubusercontent.com/WendyWjt/ArtificialIdiot/main/docs/_images/2-direction-switch-branch-random.png)
 
 ##### Rewards for Our AI
 
-![algorithm visaulize](./_images/returns-switch-with-branch.png)
+![algorithm visaulize](https://raw.githubusercontent.com/WendyWjt/ArtificialIdiot/main/docs/_images/returns-switch-with-branch.png)
 
 ### Qualitative Evaluation
 
