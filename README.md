@@ -1,4 +1,4 @@
-# ArtificialIdiot
+# [ArtificialIdiot](https://wendywjt.github.io/ArtificialIdiot/index.html)
 
 ## Recommended Way to Run
 
