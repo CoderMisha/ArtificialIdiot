@@ -196,7 +196,7 @@ We will check the result video, how the agent makes decisions, and compare perfo
 ##### [Our AI](https://www.ics.uci.edu/~tongjiew/cs175/cs175_videos/7-direction-switch-trained.mp4)
 
 <video controls width="370">
-    <source src="https://www.ics.uci.edu/~tongjiew/cs175/cs175_videos/7-direction-switch-starting.mp4"
+    <source src="https://www.ics.uci.edu/~tongjiew/cs175/cs175_videos/7-direction-switch-trained.mp4"
             type="video/mp4">
     Sorry, your browser doesn't support embedded videos.
 </video>
