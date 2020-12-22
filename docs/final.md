@@ -6,7 +6,9 @@ title: Final Report
 
 ## Video
 
-[Demo Video](https://www.ics.uci.edu/~tongjiew/cs175/status_report_vid.mp4)
+[Demo Video](https://youtu.be/mW9isVHPIfs)
+
+<iframe width="560" height="315" src="https://www.youtube.com/embed/mW9isVHPIfs" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
 
 ## Project Summary
 
@@ -50,7 +52,7 @@ For mission completion (2-direction + Redstone):
 
 7-direction:
 
-- 0: No action
+- 0: No action (The agent will send a chat command "." so that this action will have same delay as others)
 - 1: Attack left
 - 2: Attack left down
 - 3: Attack left down
@@ -62,7 +64,7 @@ For mission completion (2-direction + Redstone):
 
 2-direction + Redstone Branching:
 
-- 0: No action
+- 0: No action (The agent will send a chat command "." so that this action will have same delay as others)
 - 1: Attack left
 - 2: Attack right
 - 3: Switch tool
@@ -152,6 +154,12 @@ Rewards for time living v.s. Rewards for hitting redstone
 - Original: PPO
 - Now: DQN
 - Reason: PPO trains slowlier than DQN and for unknown reasons, it often raises exceptions. To increase efficiency and make the training process more stable, we switch from PPO to DQN.
+
+#### Map Design Changes
+
+- Original: Block and redstone will only appear once
+- Now: Increase the density of blocks and redstones; blocks will apper four times and redstone will appear twice
+- Reason: In the original design, the agent often miss hit. However, after observing and serching, we find out that it is might mainly because of an insophisticating agent or model. The delay and other program factors will cause the agent cannot make a very precise hit as human beings. Therefore, for the hitting feature, we increase the density of targets for the agent to hit.
 
 ## Evaluation
 
