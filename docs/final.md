@@ -72,17 +72,17 @@ For mission completion (2-direction + Redstone):
 
 ### Model
 
-- Deep Q Network
--> Framework: rllib <br>
--> Library: torch <br>
--> Neural network structure <br>
-    --> 3-layer Convolutional Neural Network <br>
-        ---->> nn.Conv2d(3, 6, 3) -> relu -> max_pool -> nn.Conv2d(6, 16, 3) -> relu -> max_pool -> nn.Conv2d(16, 32, 3) -> relu -> max_pool <br>
-        ---->> Input: the resized frame (shape=(314, 396, 3)) <br>
-        ---->> Activation: relu, max_pool <br>
-    --> 3-layer Fully Connected Neural Network <br>
-        ---->> nn.Linear(32 * 37 * 47, 120) -> nn.Linear(120, 84) -> nn.Linear(84, 4) <br>
-        ---->> Output: action index <br>
+Deep Q Network
+- Framework: rllib
+- Library: torch
+
+#### Neural network structure
+3-layer Convolutional Neural Network
+- nn.Conv2d(3, 6, 3) -> relu -> max_pool -> nn.Conv2d(6, 16, 3) -> relu -> max_pool -> nn.Conv2d(16, 32, 3) -> relu -> max_pool
+- Input: the resized frame (shape=(314, 396, 3))
+- Activation: relu, max_pool
+3-layer Fully Connected Neural Network
+- Output: action index
         
 
 ### Comparisons with the past approaches
