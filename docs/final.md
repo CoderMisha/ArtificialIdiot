@@ -90,9 +90,11 @@ Deep Q Network
 At the beginning: QNetwork model: a 6-layer forward-feeding neural network. No framework.
 - Advantages: Easy to program, manage and debug.
 - Disadvantage: Not as efficiency as later models.
+
 Later: PPO in default setting. Framework: rllib.
 - Advantages: Better performance compared to the previous QNetwork model. With the framework rllib, we can complete more tasks and use more powerful functions by following the API and don't need to worry about many details.
 -Disadvantages: The AI learns slowly and seems not learning the frame very efficiently. This model takes a long time but not accomplish much.
+
 Present: DQN model with CNN and FNN layers. Framework: rllib.
 - Advantages: With CNN layers, the AI is able to more efficiently learn the frames and make more correct decisions based on that. 
     
