@@ -68,6 +68,9 @@ For mission completion (2-direction + Redstone):
 ### Observation / Information for the AI
 
 - the center (396x314) of the current frame (960x540)
+
+![algorithm visualize](https://raw.githubusercontent.com/WendyWjt/ArtificialIdiot/main/docs/_images/cm_output.png)
+
 - It is worth mentioning that our agent rides on the railroad at high-speed and it needs to perform two tasks when seeing a block: (1) decide whether it needs to switch weapon; (2) turn the camera and hit. By testing, we decided that this resolution is good enough for the agent to foresee the coming blocks and make reactions.
 
 ### Model
