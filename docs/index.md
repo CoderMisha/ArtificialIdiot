@@ -10,7 +10,7 @@ Minecraft, Reinforcement Learning, Beat-Saber, Dancing-Line
 
 ## Summary
 
-We are planning to train an AI to play a minigame integrated with features in Beat-Saber and Dancing-Line in Minecraft (similar to the map in this YouTube video: Zedd & Jasmine Thompson - Funny (Minecraft Music Video \| Beat Synchronized!) but also included features similar to dancing line (reference to this YouTube video: Dancing Line \| The Piano %100 10/10 Gems)). 
+We are planning to train an AI to play a minigame integrated with features in Beat-Saber and Dancing-Line in Minecraft (similar to the map in this YouTube video: [Zedd & Jasmine Thompson - Funny (Minecraft Music Video \| Beat Synchronized!)](https://youtu.be/Wm0wFAJr1Xo)) but also included features similar to dancing line (reference to this YouTube video: [Dancing Line \| The Piano %100 10/10 Gems](https://youtu.be/FeSOAljGR80)).
 
 ![algorithm visualize](https://raw.githubusercontent.com/WendyWjt/ArtificialIdiot/main/docs/_images/on_cart_20201113.png)
 
@@ -23,6 +23,7 @@ To make this task more challenging, the AI will encounter multiple rail ways and
 ## Source Code
 
 [https://github.com/WendyWjt/ArtificialIdiot](https://github.com/WendyWjt/ArtificialIdiot)
+
 - Different versions of AIs are on different branches.
 
 ## Reference
