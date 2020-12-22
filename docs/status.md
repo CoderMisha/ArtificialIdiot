@@ -11,7 +11,6 @@ title: Status
 <video controls width="560">
     <source src="https://www.ics.uci.edu/~tongjiew/cs175/status_report_vid.mp4"
             type="video/mp4">
-
     Sorry, your browser doesn't support embedded videos.
 </video>
 

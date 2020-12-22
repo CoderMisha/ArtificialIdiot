@@ -185,19 +185,55 @@ We will check the result video, how the agent makes decisions, and compare perfo
 
 #### 7-Direction
 
-##### Random Agent
+##### [Random Agent](https://www.ics.uci.edu/~tongjiew/cs175/cs175_videos/7-direction-switch-starting.mp4)
 
-##### Our AI
+<video controls width="370">
+    <source src="https://www.ics.uci.edu/~tongjiew/cs175/cs175_videos/7-direction-switch-starting.mp4"
+            type="video/mp4">
+    Sorry, your browser doesn't support embedded videos.
+</video>
 
-##### Human Player
+##### [Our AI](https://www.ics.uci.edu/~tongjiew/cs175/cs175_videos/7-direction-switch-trained.mp4)
 
-#### 2-Direction + Redstone
+<video controls width="370">
+    <source src="https://www.ics.uci.edu/~tongjiew/cs175/cs175_videos/7-direction-switch-starting.mp4"
+            type="video/mp4">
+    Sorry, your browser doesn't support embedded videos.
+</video>
 
-##### Random Agent
+##### [Human Player](https://www.ics.uci.edu/~tongjiew/cs175/cs175_videos/8-direction+switch-weapon_human%20player.mp4)
 
-##### Our AI
+<video controls width="370">
+    <source src="https://www.ics.uci.edu/~tongjiew/cs175/cs175_videos/8-direction+switch-weapon_human%20player.mp4"
+            type="video/mp4">
+    Sorry, your browser doesn't support embedded videos.
+</video>
 
-##### Human Player
+#### 2-Direction w/ Redstone Branching
+
+##### [Random Agent](https://www.ics.uci.edu/~tongjiew/cs175/cs175_videos/2dir-random.mp4)
+
+<video controls width="370">
+    <source src="https://www.ics.uci.edu/~tongjiew/cs175/cs175_videos/2dir-random.mp4"
+            type="video/mp4">
+    Sorry, your browser doesn't support embedded videos.
+</video>
+
+##### [Our AI](https://www.ics.uci.edu/~tongjiew/cs175/cs175_videos/2dir-good.mp4)
+
+<video controls width="370">
+    <source src="https://www.ics.uci.edu/~tongjiew/cs175/cs175_videos/2dir-good.mp4"
+            type="video/mp4">
+    Sorry, your browser doesn't support embedded videos.
+</video>
+
+##### [Human Player](https://www.ics.uci.edu/~tongjiew/cs175/cs175_videos/human-2-dir-switch-branch.mp4)
+
+<video controls width="370">
+    <source src="https://www.ics.uci.edu/~tongjiew/cs175/cs175_videos/human-2-dir-switch-branch.mp4"
+            type="video/mp4">
+    Sorry, your browser doesn't support embedded videos.
+</video>
 
 #### Comments for Qualitative Evaluation
 
