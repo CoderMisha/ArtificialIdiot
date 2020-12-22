@@ -159,7 +159,7 @@ Rewards for time living v.s. Rewards for hitting redstone
 
 The total score the agent receives after completing each episode is one evaluation criteria. The higher the score, the longer the agent lives, and the better its performance is. Scores will consist of different parts including living (penalty for not hitting lever and ride into lava), correct hitting (hit the block with the tool in the same color), and hitting timing. We will use random agents as the first baseline, human-player score as the second baseline, and train the agent to perform better than act randomly and approach the manual performance.
 
-#### 7-direction
+#### 7-Direction
 
 ##### Rewards for Random Agent (Baseline)
 
@@ -169,7 +169,7 @@ The total score the agent receives after completing each episode is one evaluati
 
 ![algorithm visaulize](./_images/7-direction-weapon-switch-no-redstone.png)
 
-#### 2-direction + Redstone
+#### 2-Direction + Redstone
 
 ##### Rewards for Random Agent (Baseline)
 
@@ -183,23 +183,23 @@ The total score the agent receives after completing each episode is one evaluati
 
 We will check the result video, how the agent makes decisions, and compare performance between them.
 
-#### 7-direction
+#### 7-Direction
 
 ##### Random Agent
 
+##### Our AI
+
 ##### Human Player
+
+#### 2-Direction + Redstone
+
+##### Random Agent
 
 ##### Our AI
 
-#### 2-direction + Redstone
-
-##### Random AI
-
 ##### Human Player
 
-##### Good AI
-
-#### Comments for qualitative evaluation
+#### Comments for Qualitative Evaluation
 
 Clearly improvements from random agents:
 
