@@ -16,13 +16,14 @@ We are planning to train an AI to play a minigame integrated with features in Be
 
 The task of the AI is trying to hit the block along the railroad while riding on it with swords in the same color with the block at the proper time (i.e. right before the block is passing the agent). A correct and precise hit will increase the AI's score, and a miss or hitting with a sword in wrong color would decrease the score. The AI should take the game frame as input and perform "aim" and "attack" action correspondingly.
 
-![algorithm visualize](https://raw.githubusercontent.com/WendyWjt/ArtificialIdiot/main/docs/_images/choice_20201113.png)
+![algorithm visualize](https://raw.githubusercontent.com/WendyWjt/ArtificialIdiot/main/docs/_images/Branch.jpg)
 
 To make this task more challenging, the AI will encounter multiple rail ways and have to choose the correct one (other wrong ones will lead to lava).
 
 ## Source Code
 
 [https://github.com/WendyWjt/ArtificialIdiot](https://github.com/WendyWjt/ArtificialIdiot)
+- Different versions of AIs are on different branches.
 
 ## Reference
 
