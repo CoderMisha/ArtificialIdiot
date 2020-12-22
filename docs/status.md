@@ -8,6 +8,13 @@ title: Status
 
 [Demo Video](https://www.ics.uci.edu/~tongjiew/cs175/status_report_vid.mp4)
 
+<video controls>
+    <source src="https://www.ics.uci.edu/~tongjiew/cs175/status_report_vid.mp4"
+            type="video/mp4">
+
+    Sorry, your browser doesn't support embedded videos.
+</video>
+
 ## Project Summary
 
 We are planning to train an AI to play a minigame integrated with features in Beat-Saber (similar to the map in this YouTube video: Zedd & Jasmine Thompson - Funny (Minecraft Music Video \| Beat Synchronized!) but also included features similar to dancing line (similar to this YouTube video: Dancing Line \| The Piano %100 10/10 Gems)).
